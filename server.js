@@ -1,23 +1,27 @@
 const express = require('express');
 
 const app = express();
-
 app.use(express.json());
 
-app.get('/',function(req, res){
-    return res.send('hello world')
-})
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 
-const users = [{name: "Gyubin", age: 30}];
+const options = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'Madin backend api',
+            version: '1.0.0',
+        },
+    },
+    apis: ['./routes/*.js'],
+};
 
-app.get('/user', function(req,res){
-    return res.send({ users: users})
-})
+const openapiSpec = swaggerJsdoc(options);
 
-app.post('/user', function(req,res){
-    users.push({name:req.body.name, age:req.body.age})
-    return res.send({success: true})
-})
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpec));
+
+app.use('/api',require('./routes/api'));
 
 app.listen(3000, function() {
     console.log('server listening on port 3000');
