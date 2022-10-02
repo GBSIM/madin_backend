@@ -52,7 +52,7 @@ userRouter.get('/:code', async(req,res) => {
 *               description: Returns the registered user
 */
 
-userRouter.post('/user', async(req,res) => {
+userRouter.post('/', async(req,res) => {
     try {
         console.log('Signup requested...');
         let {username, email, code} = req.body;
