@@ -54,7 +54,9 @@ userRouter.get('/:code', async(req,res) => {
 
 userRouter.post('/user', async(req,res) => {
     try {
+        console.log('Signup requested...');
         let {username, email, code} = req.body;
+        console.log(username);
         if (!username) return res.status(400).send({err: "username is required"})
         if (!email) return res.status(400).send({err: "email is required"})
         if (!code) return res.status(400).send({err: "code is required"})
