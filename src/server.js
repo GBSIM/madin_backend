@@ -32,7 +32,7 @@ const server = async() => {
         let mongodbConnection = await mongoose.connect(MONGO_URI);
         console.log('Mongo DB connected!');
         
-        app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpec));
+        app.use('/', swaggerUi.serve, swaggerUi.setup(openapiSpec));
         app.use('/user',userRouter);
 
         app.listen(3000, () => console.log('server listening on port 3000'))
