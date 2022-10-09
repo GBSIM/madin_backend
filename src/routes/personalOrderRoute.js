@@ -122,6 +122,8 @@ personalOrderRouter.post('/', async(req,res) => {
 *                       properties:
 *                           shipping:
 *                               type: object
+*                           status:
+*                               type: string
 *       responses:
 *           200: 
 *               description:  A JSON object of requested personal order
@@ -131,9 +133,9 @@ personalOrderRouter.post('/', async(req,res) => {
 personalOrderRouter.put('/:orderId', async(req,res) => {
     try {
         const { orderId } = req.params;
-        const { shipping } = req.body;
+        const { shipping, status } = req.body;
         if (!isValidObjectId(orderId)) return res.status(400).send({err: "invalid order id"})
-        const personalOrder = await PersonalOrder.findByIdAndUpdate(orderId, {$set: {shipping}},{new: true});
+        const personalOrder = await PersonalOrder.findByIdAndUpdate(orderId, {$set: {shipping, status}},{new: true});
         return res.send({personalOrder})
     } catch(err) {
         console.log(err);
