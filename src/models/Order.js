@@ -7,7 +7,6 @@ const OrderSchema = new Schema({
         name: {type: String, required: true},
         phone: {type: String, required: true},
         address: {type: String, required: true},
-        request: String,
     },
     mileageUse: {type: Number, required: true, default: 0},
     coupon: {type: Types.ObjectId, ref: "coupon"},
