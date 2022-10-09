@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const {User} = require('../models');
+const { isValidObjectId } = require('mongoose');
 
 const userRouter = Router();
 
@@ -93,13 +94,13 @@ userRouter.post('/', async(req,res) => {
 
 /**
 * @openapi
-* /user/{code}:
+* /user/{userId}:
 *   delete:
 *       description: delete user's information
 *       parameters:
-*           - name: code
+*           - name: userId
 *             in: path     
-*             description: code of user
+*             description: id of user
 *             schema:
 *               type: string       
 *       responses:
@@ -108,10 +109,11 @@ userRouter.post('/', async(req,res) => {
 *       tags:
 *           - User
 */
-userRouter.delete('/:code', async(req,res) => {
+userRouter.delete('/:userId', async(req,res) => {
     try {
-        const { code } = req.params;
-        const user = await User.findOneAndDelete({code: code});
+        const { userId } = req.params;
+        if (!isValidObjectId(userId)) return res.status(400).send({err: "invalid user id"})
+        const user = await User.findByIdAndDelete(userId);
         return res.send({user})
     } catch(err) {
         console.log(err);

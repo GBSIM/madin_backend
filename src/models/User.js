@@ -6,6 +6,7 @@ const UserSchema = new Schema({
     phone: { type: String, required: true, default: "01000000000"},
     profileImageUrl: String,
     code: { type: String, required: true, unique: true},
+    mileage: { type: Number, required: true, default: 0},
 }, {timestamps: true})
 
 const User = model('user',UserSchema);
