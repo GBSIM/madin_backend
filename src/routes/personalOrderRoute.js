@@ -142,4 +142,33 @@ personalOrderRouter.put('/:orderId', async(req,res) => {
     }
 })
 
+/**
+* @openapi
+* /personalorder/{orderId}:
+*   delete:
+*       description: delete an personal order
+*       parameters:
+*           - name: orderId
+*             in: path     
+*             description: id of personal order
+*             schema:
+*               type: string       
+*       responses:
+*           200: 
+*               description: Returns the deleted personal order
+*       tags:
+*           - Order
+*/
+personalOrderRouter.delete('/:orderId', async(req,res) => {
+    try {
+        const { orderId } = req.params;
+        if (!isValidObjectId(orderId)) return res.status(400).send({err: "invalid order id"})
+        const personalOrder = await PersonalOrder.findByIdAndRemove(orderId);
+        return res.send({personalOrder})
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({err: err.message})
+    }
+})
+
 module.exports = { personalOrderRouter };
