@@ -7,6 +7,7 @@ const UserSchema = new Schema({
     profileImageUrl: String,
     code: { type: String, required: true, unique: true},
     mileage: { type: Number, required: true, default: 0},
+    shipping: {type: Array, required: true, default: []},
 }, {timestamps: true})
 
 const User = model('user',UserSchema);
