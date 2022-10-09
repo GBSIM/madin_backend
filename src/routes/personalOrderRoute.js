@@ -89,8 +89,8 @@ personalOrderRouter.post('/', async(req,res) => {
         let {product, ordererId, shipping, mileageUse, coupon, payment} = req.body;
         if (!product) return res.status(400).send({err: "product is required"})
         if (!ordererId) return res.status(400).send({err: "ordererId is required"})
+        if (!isValidObjectId(ordererId)) return res.status(400).send({err: "invalid ordererId id"})
         if (!shipping) return res.status(400).send({err: "shipping is required"})
-        if (!mileageUse) return res.status(400).send({err: "mileageUse is required"})
         if (!payment) return res.status(400).send({err: "payment is required"})
         let orderer = await User.findById(ordererId)
         const personalOrder = new PersonalOrder({ ...req.body,orderer });
