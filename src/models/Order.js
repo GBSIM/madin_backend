@@ -12,7 +12,9 @@ const OrderSchema = new Schema({
     mileageUse: {type: Number, required: true, default: 0},
     coupon: {type: Types.ObjectId, ref: "coupon"},
     payment: {type: String, required: true},
-    status: {type: String, required: true, default: "결제완료"}
+    deliveryDate: {type: Date},
+    pickupDate: {type: Date},
+    status: {type: String, required: true, default: "결제완료"},
 }, { timestamps: true});
 
 const Order = model('personalorder', OrderSchema);
