@@ -13,7 +13,7 @@ const personalOrderRouter = Router();
 *           200: 
 *               description: A list of JSON array of personal order
 *       tags:
-*           - Order
+*           - PersonalOrder
 */
 personalOrderRouter.get('/',async(req,res) => {
     try {
@@ -40,7 +40,7 @@ personalOrderRouter.get('/',async(req,res) => {
 *           200: 
 *               description: A JSON array of personal order
 *       tags:
-*           - Order
+*           - PersonalOrder
 */
 personalOrderRouter.get('/:orderId',async(req,res) => {
     try {
@@ -82,7 +82,7 @@ personalOrderRouter.get('/:orderId',async(req,res) => {
 *           200: 
 *               description:  A JSON object of requested personal order
 *       tags:
-*           - Order
+*           - PersonalOrder
 */
 personalOrderRouter.post('/', async(req,res) => {
     try {
@@ -130,7 +130,7 @@ personalOrderRouter.post('/', async(req,res) => {
 *           200: 
 *               description:  A JSON object of requested personal order
 *       tags:
-*           - Order
+*           - PersonalOrder
 */
 personalOrderRouter.put('/:orderId', async(req,res) => {
     try {
@@ -160,7 +160,7 @@ personalOrderRouter.put('/:orderId', async(req,res) => {
 *           200: 
 *               description: Returns the deleted personal order
 *       tags:
-*           - Order
+*           - PersonalOrder
 */
 personalOrderRouter.delete('/:orderId', async(req,res) => {
     try {
