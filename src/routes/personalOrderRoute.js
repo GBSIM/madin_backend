@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const { PersonalOrder } = require('../models/PersonalOrder');
 const { User } = require('../models/User');
+const { isValidObjectId } = require('mongoose');
 
 const personalOrderRouter = Router();
 
@@ -11,13 +12,42 @@ const personalOrderRouter = Router();
 *       description: Get all the personal orders list
 *       responses:
 *           200: 
-*               description: A JSON array of personal order
+*               description: A list of JSON array of personal order
 *       tags:
 *           - Order
 */
 personalOrderRouter.get('/',async(req,res) => {
     try {
         const personalOrder = await PersonalOrder.find();
+        return res.send({personalOrder})
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({err: err.message})
+    }
+})
+
+/**
+* @openapi
+* /personalorder/{orderId}:
+*   get:
+*       description: Get an order
+*       parameters:
+*           - name: orderId
+*             in: path     
+*             description: id of the order
+*             schema:
+*               type: string
+*       responses:
+*           200: 
+*               description: A JSON array of personal order
+*       tags:
+*           - Order
+*/
+personalOrderRouter.get('/:orderId',async(req,res) => {
+    try {
+        const { orderId } = req.params;
+        if (!isValidObjectId(orderId)) return res.status(400).send({err: "invalid order id"})
+        const personalOrder = await PersonalOrder.findById(orderId);
         return res.send({personalOrder})
     } catch(err) {
         console.log(err);
@@ -72,5 +102,44 @@ personalOrderRouter.post('/', async(req,res) => {
         return res.status(500).send({err: err.message})
     }
 });
+
+/**
+* @openapi
+* /personalorder/{orderId}:
+*   put:
+*       description: modify personal order
+*       parameters:
+*           - name: orderId
+*             in: path     
+*             description: id of the order
+*             schema:
+*               type: string
+*       requestBody:
+*           required: true
+*           content:
+*               application/json:
+*                   schema:
+*                       type: object
+*                       properties:
+*                           shipping:
+*                               type: object
+*       responses:
+*           200: 
+*               description:  A JSON object of requested personal order
+*       tags:
+*           - Order
+*/
+personalOrderRouter.put('/:orderId', async(req,res) => {
+    try {
+        const { orderId } = req.params;
+        const { shipping } = req.body;
+        if (!isValidObjectId(orderId)) return res.status(400).send({err: "invalid order id"})
+        const personalOrder = await PersonalOrder.findByIdAndUpdate(orderId, {$set: {shipping}},{new: true});
+        return res.send({personalOrder})
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({err: err.message})
+    }
+})
 
 module.exports = { personalOrderRouter };
