@@ -1,6 +1,5 @@
 const { Router } = require('express');
-const { PersonalOrder } = require('../models/PersonalOrder');
-const { User } = require('../models/User');
+const { User, PersonalOrder } = require('../models');
 const { isValidObjectId } = require('mongoose');
 
 const personalOrderRouter = Router();

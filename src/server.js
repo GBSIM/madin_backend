@@ -3,8 +3,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const mongoose = require('mongoose');
 const env = require('dotenv');
-const {userRouter} = require('./routes/userRoute');
-const {personalOrderRouter} = require('./routes/personalOrderRoute');
+const {userRouter,personalOrderRouter} = require('./routes');
 env.config();
 
 const app = express();
