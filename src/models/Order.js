@@ -14,8 +14,9 @@ const OrderSchema = new Schema({
     payment: {type: String, required: true},
     deliveryDate: {type: Date},
     pickupDate: {type: Date},
+    type: {type: String, required: true, default: "개인"},
     status: {type: String, required: true, default: "결제완료"},
 }, { timestamps: true});
 
-const Order = model('personalorder', OrderSchema);
+const Order = model('order', OrderSchema);
 module.exports = { Order };

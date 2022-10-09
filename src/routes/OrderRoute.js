@@ -78,6 +78,12 @@ orderRouter.get('/:orderId',async(req,res) => {
 *                               type: number
 *                           payment:
 *                               type: string
+*                           deliveryDate:
+*                               type: string
+*                           pickupDate:
+*                               type: string
+*                           type:
+*                               type: string
 *       responses:
 *           200: 
 *               description:  A JSON object of requested order
