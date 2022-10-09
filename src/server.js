@@ -3,7 +3,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const mongoose = require('mongoose');
 const env = require('dotenv');
-const {userRouter,personalOrderRouter} = require('./routes');
+const {userRouter, orderRouter} = require('./routes');
 env.config();
 
 const app = express();
@@ -34,7 +34,7 @@ const server = async() => {
         
         app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpec));
         app.use('/user',userRouter);
-        app.use('/personalorder',personalOrderRouter);
+        app.use('/order',orderRouter);
 
         app.listen(3000, () => console.log('server listening on port 3000'))
     } catch(err) {

@@ -1,24 +1,24 @@
 const { Router } = require('express');
-const { User, PersonalOrder } = require('../models');
+const { User, Order } = require('../models');
 const { isValidObjectId } = require('mongoose');
 
-const personalOrderRouter = Router();
+const orderRouter = Router();
 
 /**
 * @openapi
-* /personalorder:
+* /order:
 *   get:
-*       description: Get all the personal orders list
+*       description: Get all the orders list
 *       responses:
 *           200: 
 *               description: A list of JSON array of personal order
 *       tags:
-*           - PersonalOrder
+*           - Order
 */
-personalOrderRouter.get('/',async(req,res) => {
+orderRouter.get('/',async(req,res) => {
     try {
-        const personalOrder = await PersonalOrder.find();
-        return res.send({personalOrder})
+        const order = await Order.find();
+        return res.send({order})
     } catch(err) {
         console.log(err);
         return res.status(500).send({err: err.message})
@@ -27,7 +27,7 @@ personalOrderRouter.get('/',async(req,res) => {
 
 /**
 * @openapi
-* /personalorder/{orderId}:
+* /order/{orderId}:
 *   get:
 *       description: Get an order
 *       parameters:
@@ -38,16 +38,16 @@ personalOrderRouter.get('/',async(req,res) => {
 *               type: string
 *       responses:
 *           200: 
-*               description: A JSON array of personal order
+*               description: A JSON array of order
 *       tags:
-*           - PersonalOrder
+*           - Order
 */
-personalOrderRouter.get('/:orderId',async(req,res) => {
+orderRouter.get('/:orderId',async(req,res) => {
     try {
         const { orderId } = req.params;
         if (!isValidObjectId(orderId)) return res.status(400).send({err: "invalid order id"})
-        const personalOrder = await PersonalOrder.findById(orderId);
-        return res.send({personalOrder})
+        const order = await Order.findById(orderId);
+        return res.send({order})
     } catch(err) {
         console.log(err);
         return res.status(500).send({err: err.message})
@@ -56,7 +56,7 @@ personalOrderRouter.get('/:orderId',async(req,res) => {
 
 /**
 * @openapi
-* /personalorder:
+* /order:
 *   post:
 *       description: Order
 *       requestBody:
@@ -80,11 +80,11 @@ personalOrderRouter.get('/:orderId',async(req,res) => {
 *                               type: string
 *       responses:
 *           200: 
-*               description:  A JSON object of requested personal order
+*               description:  A JSON object of requested order
 *       tags:
-*           - PersonalOrder
+*           - Order
 */
-personalOrderRouter.post('/', async(req,res) => {
+orderRouter.post('/', async(req,res) => {
     try {
         let {product, ordererId, shipping, mileageUse, coupon, payment} = req.body;
         if (!product) return res.status(400).send({err: "product is required"})
@@ -95,9 +95,9 @@ personalOrderRouter.post('/', async(req,res) => {
         let orderer = await User.findById(ordererId)
         if (!orderer) return res.status(400).send({err: "invalid orderer"})
         if (mileageUse > orderer.mileage) return res.status(400).send({err: "mileage use should not be more than the order's mileage"})
-        const personalOrder = new PersonalOrder({ ...req.body,orderer });
-        await personalOrder.save();
-        return res.send({personalOrder})
+        const order = new Order({ ...req.body,orderer });
+        await order.save();
+        return res.send({order})
     } catch(err) {
         console.log(err);
         return res.status(500).send({err: err.message})
@@ -106,9 +106,9 @@ personalOrderRouter.post('/', async(req,res) => {
 
 /**
 * @openapi
-* /personalorder/{orderId}:
+* /order/{orderId}:
 *   put:
-*       description: modify personal order
+*       description: modify order
 *       parameters:
 *           - name: orderId
 *             in: path     
@@ -128,17 +128,17 @@ personalOrderRouter.post('/', async(req,res) => {
 *                               type: string
 *       responses:
 *           200: 
-*               description:  A JSON object of requested personal order
+*               description:  A JSON object of requested order
 *       tags:
-*           - PersonalOrder
+*           - Order
 */
-personalOrderRouter.put('/:orderId', async(req,res) => {
+orderRouter.put('/:orderId', async(req,res) => {
     try {
         const { orderId } = req.params;
         const { shipping, status } = req.body;
         if (!isValidObjectId(orderId)) return res.status(400).send({err: "invalid order id"})
-        const personalOrder = await PersonalOrder.findByIdAndUpdate(orderId, {$set: {shipping, status}},{new: true});
-        return res.send({personalOrder})
+        const order = await Order.findByIdAndUpdate(orderId, {$set: {shipping, status}},{new: true});
+        return res.send({order})
     } catch(err) {
         console.log(err);
         return res.status(500).send({err: err.message})
@@ -147,31 +147,31 @@ personalOrderRouter.put('/:orderId', async(req,res) => {
 
 /**
 * @openapi
-* /personalorder/{orderId}:
+* /order/{orderId}:
 *   delete:
-*       description: delete an personal order
+*       description: delete an order
 *       parameters:
 *           - name: orderId
 *             in: path     
-*             description: id of personal order
+*             description: id of order
 *             schema:
 *               type: string       
 *       responses:
 *           200: 
-*               description: Returns the deleted personal order
+*               description: Returns the deleted order
 *       tags:
-*           - PersonalOrder
+*           - Order
 */
-personalOrderRouter.delete('/:orderId', async(req,res) => {
+orderRouter.delete('/:orderId', async(req,res) => {
     try {
         const { orderId } = req.params;
         if (!isValidObjectId(orderId)) return res.status(400).send({err: "invalid order id"})
-        const personalOrder = await PersonalOrder.findByIdAndRemove(orderId);
-        return res.send({personalOrder})
+        const order = await Order.findByIdAndRemove(orderId);
+        return res.send({order})
     } catch(err) {
         console.log(err);
         return res.status(500).send({err: err.message})
     }
 })
 
-module.exports = { personalOrderRouter };
+module.exports = { orderRouter };

@@ -1,6 +1,6 @@
 const { Schema, model, Types } = require('mongoose');
 
-const PersonalOrderSchema = new Schema({
+const OrderSchema = new Schema({
     product: { type: Array, required: true},
     orderer: { type: Types.ObjectId, required: true, ref: "user"},
     shipping: {
@@ -15,5 +15,5 @@ const PersonalOrderSchema = new Schema({
     status: {type: String, required: true, default: "결제완료"}
 }, { timestamps: true});
 
-const PersonalOrder = model('personalorder', PersonalOrderSchema);
-module.exports = { PersonalOrder };
+const Order = model('personalorder', OrderSchema);
+module.exports = { Order };
