@@ -94,6 +94,7 @@ personalOrderRouter.post('/', async(req,res) => {
         if (!payment) return res.status(400).send({err: "payment is required"})
         let orderer = await User.findById(ordererId)
         if (!orderer) return res.status(400).send({err: "invalid orderer"})
+        if (mileageUse > orderer.mileage) return res.status(400).send({err: "mileage use should not be more than the order's mileage"})
         const personalOrder = new PersonalOrder({ ...req.body,orderer });
         await personalOrder.save();
         return res.send({personalOrder})
