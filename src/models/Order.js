@@ -23,4 +23,4 @@ const OrderSchema = new Schema({
 }, { timestamps: true});
 
 const Order = model('order', OrderSchema);
-module.exports = { Order };
+module.exports = { Order, OrderSchema};

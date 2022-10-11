@@ -102,7 +102,10 @@ orderRouter.post('/', async(req,res) => {
         if (!orderer) return res.status(400).send({err: "invalid orderer"})
         if (mileageUse > orderer.mileage) return res.status(400).send({err: "mileage use should not be more than the order's mileage"})
         const order = new Order({ ...req.body,orderer });
-        await order.save();
+        await Promise.all([
+            order.save(),
+            User.updateOne({ _id: ordererId }, { $push: { orders: order }})
+        ]);
         return res.send({order})
     } catch(err) {
         console.log(err);
@@ -173,6 +176,7 @@ orderRouter.delete('/:orderId', async(req,res) => {
         const { orderId } = req.params;
         if (!isValidObjectId(orderId)) return res.status(400).send({err: "invalid order id"})
         const order = await Order.findByIdAndRemove(orderId);
+        if (!order) return res.status(400).send({err: "Invalid order id"})
         return res.send({order})
     } catch(err) {
         console.log(err);

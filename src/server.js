@@ -33,8 +33,8 @@ const server = async() => {
         console.log('Mongo DB connected!');
         
         app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpec));
-        app.use('/user',userRouter);
         app.use('/order',orderRouter);
+        app.use('/user',userRouter);
 
         app.listen(3000, () => console.log('server listening on port 3000'))
     } catch(err) {
