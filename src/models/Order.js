@@ -1,15 +1,15 @@
-const { Schema, model, Types } = require('mongoose');
+const { Schema, model, Types:{ ObjectId } } = require('mongoose');
 
 const OrderSchema = new Schema({
     product: { type: Array, required: true},
-    orderer: { type: Types.ObjectId, required: true, ref: "user"},
+    orderer: { type: ObjectId, required: true, ref: "user"},
     shipping: {
         name: {type: String, required: true},
         phone: {type: String, required: true},
         address: {type: String, required: true},
     },
     mileageUse: {type: Number, required: true, default: 0},
-    coupon: {type: Types.ObjectId, ref: "coupon"},
+    coupon: {type: ObjectId, ref: "coupon"},
     payment: {type: String, required: true},
     deliveryDate: {type: Date},
     pickupDate: {type: Date},
