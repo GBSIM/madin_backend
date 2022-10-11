@@ -124,7 +124,7 @@ userRouter.delete('/:userId', async(req,res) => {
 /**
 * @openapi
 * /user/{code}:
-*   put:
+*   patch:
 *       description: Update the user's information
 *       parameters:
 *           - name: code
@@ -149,7 +149,7 @@ userRouter.delete('/:userId', async(req,res) => {
 *       tags:
 *           - User
 */
-userRouter.put('/:code', async(req,res) => {
+userRouter.patch('/:code', async(req,res) => {
     try {
         const { code } = req.params;
         const { profileImageUrl, email } = req.body;
