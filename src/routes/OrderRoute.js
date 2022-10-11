@@ -84,6 +84,10 @@ orderRouter.get('/:orderId',async(req,res) => {
 *                               type: string
 *                           type:
 *                               type: string
+*                           orderPrice:
+*                               type: number
+*                           payedMoney:
+*                               type: number
 *       responses:
 *           200: 
 *               description:  A JSON object of requested order
@@ -92,7 +96,7 @@ orderRouter.get('/:orderId',async(req,res) => {
 */
 orderRouter.post('/', async(req,res) => {
     try {
-        let {product, ordererId, shipping, mileageUse, coupon, payment} = req.body;
+        let {product, ordererId, shipping, mileageUse, coupon, payment, orderPrice, payedMoney} = req.body;
         if (!product) return res.status(400).send({err: "product is required"})
         if (!ordererId) return res.status(400).send({err: "ordererId is required"})
         if (!isValidObjectId(ordererId)) return res.status(400).send({err: "invalid ordererId id"})
@@ -100,6 +104,8 @@ orderRouter.post('/', async(req,res) => {
         if (!payment) return res.status(400).send({err: "payment is required"})
         let orderer = await User.findById(ordererId)
         if (!orderer) return res.status(400).send({err: "invalid orderer"})
+        if (!orderPrice) return res.status(400).send({err: "orderPrice is required"})
+        if (!payedMoney) return res.status(400).send({err: "payedMoney is required"})
         if (mileageUse > orderer.mileage) return res.status(400).send({err: "mileage use should not be more than the order's mileage"})
         const order = new Order({ ...req.body,orderer });
         await Promise.all([

@@ -20,6 +20,8 @@ const OrderSchema = new Schema({
     pickupDate: {type: Date},
     type: {type: String, required: true, default: "개인"},
     status: {type: String, required: true, default: "결제완료"},
+    orderPrice: {type: Number, required: true},
+    payedMoney: {type: Number, required: true},
 }, { timestamps: true});
 
 const Order = model('order', OrderSchema);
