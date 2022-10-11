@@ -190,6 +190,9 @@ orderRouter.delete('/:orderId', async(req,res) => {
         if (!isValidObjectId(orderId)) return res.status(400).send({err: "invalid order id"})
         const order = await Order.findByIdAndRemove(orderId);
         if (!order) return res.status(400).send({err: "Invalid order id"})
+        await User.updateOne(
+            { "orders._id":orderId},
+            { $pull: { orders: {_id: orderId}}});
         return res.send({order})
     } catch(err) {
         console.log(err);
