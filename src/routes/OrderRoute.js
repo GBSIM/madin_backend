@@ -122,7 +122,7 @@ orderRouter.post('/', async(req,res) => {
 /**
 * @openapi
 * /order/{orderId}:
-*   put:
+*   patch:
 *       description: modify order
 *       parameters:
 *           - name: orderId
@@ -141,18 +141,25 @@ orderRouter.post('/', async(req,res) => {
 *                               type: object
 *                           status:
 *                               type: string
+*                           deliveryDate:
+*                               type: string
+*                           pickupDate:
+*                               type: string
 *       responses:
 *           200: 
 *               description:  A JSON object of requested order
 *       tags:
 *           - Order
 */
-orderRouter.put('/:orderId', async(req,res) => {
+orderRouter.patch('/:orderId', async(req,res) => {
     try {
         const { orderId } = req.params;
-        const { shipping, status } = req.body;
+        const { shipping, status, deliveryDate, pickupDate } = req.body;
         if (!isValidObjectId(orderId)) return res.status(400).send({err: "invalid order id"})
-        const order = await Order.findByIdAndUpdate(orderId, {$set: {shipping, status}},{new: true});
+        const order = await Order.findByIdAndUpdate(orderId, {$set: {shipping, status, deliveryDate, pickupDate}},{new: true});
+        await User.updateOne(
+            { 'orders._id': orderId }, 
+            { "orders.$.shipping":shipping, "orders.$.status":status, "orders.$.deliveryDate": deliveryDate, "orders.$.pickupDate": pickupDate})
         return res.send({order})
     } catch(err) {
         console.log(err);
