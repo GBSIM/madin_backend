@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { User, Order } = require('../models');
+const { User, Order, Shipping } = require('../models');
 const { isValidObjectId } = require('mongoose');
 
 const orderRouter = Router();
@@ -56,13 +56,13 @@ orderRouter.get('/:orderId',async(req,res) => {
 
 /**
 * @openapi
-* /order/{orderId}:
+* /order/{ordererId}:
 *   post:
 *       description: Order
 *       parameters:
-*           - name: orderId
+*           - name: ordererId
 *             in: path     
-*             description: id of order
+*             description: id of orderer
 *             schema:
 *               type: string       
 *       requestBody:
@@ -76,8 +76,8 @@ orderRouter.get('/:orderId',async(req,res) => {
 *                               type: array
 *                               items:
 *                                   type: object
-*                           shipping:
-*                               type: object
+*                           shippingId:
+*                               type: string
 *                           mileageUse:
 *                               type: number
 *                           payment:
@@ -101,18 +101,20 @@ orderRouter.get('/:orderId',async(req,res) => {
 orderRouter.post('/:ordererId', async(req,res) => {
     try {
         const { ordererId } = req.params;
-        let {product, shipping, mileageUse, coupon, payment, orderPrice, payedMoney} = req.body;
+        let {product, shippingId, mileageUse, coupon, payment, orderPrice, payedMoney} = req.body;
         if (!product) return res.status(400).send({err: "product is required"})
         if (!ordererId) return res.status(400).send({err: "ordererId is required"})
         if (!isValidObjectId(ordererId)) return res.status(400).send({err: "invalid ordererId id"})
-        if (!shipping) return res.status(400).send({err: "shipping is required"})
+        if (!shippingId) return res.status(400).send({err: "shippingId is required"})
         if (!payment) return res.status(400).send({err: "payment is required"})
         let orderer = await User.findById(ordererId)
         if (!orderer) return res.status(400).send({err: "invalid orderer"})
         if (!orderPrice) return res.status(400).send({err: "orderPrice is required"})
         if (!payedMoney) return res.status(400).send({err: "payedMoney is required"})
         if (mileageUse > orderer.mileage) return res.status(400).send({err: "mileage use should not be more than the order's mileage"})
-        const order = new Order({ ...req.body,orderer });
+        let shipping = await Shipping.findById(shippingId);
+        if (!shipping) return res.status(400).send({err: "invalid shipping"})
+        const order = new Order({ ...req.body,orderer,shipping });
         await Promise.all([
             order.save(),
             User.updateOne({ _id: ordererId }, { $push: { orders: order }})

@@ -9,9 +9,12 @@ const OrderSchema = new Schema({
         email: {type: String, required: true}
     },
     shipping: {
+        _id: {type: ObjectId, required: true, ref: "shipping"},
         name: {type: String, required: true},
         phone: {type: String, required: true},
         address: {type: String, required: true},
+        request: {type: String, required: true},
+        tag: {type: String, required: true},
     },
     mileageUse: {type: Number, required: true, default: 0},
     coupon: {type: ObjectId, ref: "coupon"},
