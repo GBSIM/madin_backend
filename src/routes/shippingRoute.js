@@ -46,7 +46,7 @@ shippingRouter.get('/:userId',async(req,res) => {
     try {
         const { userId } = req.params;
         if (!isValidObjectId(userId)) return res.status(400).send({err: "invalid user id"})
-        const shipping = await Shipping.find({user: userId});
+        const shipping = await Shipping.find({userId: userId});
         return res.send({shipping})
     } catch(err) {
         console.log(err);

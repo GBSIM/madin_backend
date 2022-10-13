@@ -143,6 +143,10 @@ userRouter.delete('/:userId', async(req,res) => {
 *                               type: string
 *                           email:
 *                               type: string
+*                           phone:
+*                               type: string
+*                           username:
+*                               type: string
 *       responses:
 *           200: 
 *               description: Returns the updated user
@@ -152,8 +156,8 @@ userRouter.delete('/:userId', async(req,res) => {
 userRouter.patch('/:code', async(req,res) => {
     try {
         const { code } = req.params;
-        const { profileImageUrl, email } = req.body;
-        const user = await User.findOneAndUpdate({code: code}, {$set: {profileImageUrl,email}},{new: true});
+        const { profileImageUrl, email, phone, username } = req.body;
+        const user = await User.findOneAndUpdate({code: code}, {$set: {profileImageUrl,email,phone,username}},{new: true});
         return res.send({user})
     } catch(err) {
         console.log(err);
