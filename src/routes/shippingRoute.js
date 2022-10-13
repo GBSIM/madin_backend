@@ -59,6 +59,12 @@ shippingRouter.get('/:userId',async(req,res) => {
 * /shipping/{userId}:
 *   post:
 *       description: register shipping information
+*       parameters:
+*           - name: userId
+*             in: path     
+*             description: id of the user
+*             schema:
+*               type: string
 *       requestBody:
 *           required: true
 *           content:
