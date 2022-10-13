@@ -56,7 +56,7 @@ orderRouter.get('/:orderId',async(req,res) => {
 
 /**
 * @openapi
-* /order:
+* /order/{ordererId}:
 *   post:
 *       description: Order
 *       requestBody:
@@ -70,8 +70,6 @@ orderRouter.get('/:orderId',async(req,res) => {
 *                               type: array
 *                               items:
 *                                   type: object
-*                           ordererId:
-*                               type: string
 *                           shipping:
 *                               type: object
 *                           mileageUse:
@@ -94,9 +92,10 @@ orderRouter.get('/:orderId',async(req,res) => {
 *       tags:
 *           - Order
 */
-orderRouter.post('/', async(req,res) => {
+orderRouter.post('/:ordererId', async(req,res) => {
     try {
-        let {product, ordererId, shipping, mileageUse, coupon, payment, orderPrice, payedMoney} = req.body;
+        const { ordererId } = req.params;
+        let {product, shipping, mileageUse, coupon, payment, orderPrice, payedMoney} = req.body;
         if (!product) return res.status(400).send({err: "product is required"})
         if (!ordererId) return res.status(400).send({err: "ordererId is required"})
         if (!isValidObjectId(ordererId)) return res.status(400).send({err: "invalid ordererId id"})

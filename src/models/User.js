@@ -1,5 +1,6 @@
 const {Schema, model} = require('mongoose');
 const { OrderSchema } = require('./Order');
+const { ShippingSchema } = require('./Shipping');
 
 const UserSchema = new Schema({
     username: { type: String, required: true},
@@ -8,7 +9,7 @@ const UserSchema = new Schema({
     profileImageUrl: String,
     code: { type: String, required: true, unique: true},
     mileage: { type: Number, required: true, default: 0},
-    shipping: {type: Array, required: true, default: []},
+    shippings: [ShippingSchema],
     orders: [OrderSchema],
 }, {timestamps: true})
 
