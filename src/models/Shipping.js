@@ -1,5 +1,4 @@
 const {Schema, model, Types:{ ObjectId }} = require('mongoose');
-const { ShippingSchema } = require('./Order');
 
 const ShippingSchema = new Schema({
     name: {type: String, required: true},
