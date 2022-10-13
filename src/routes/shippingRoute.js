@@ -153,4 +153,37 @@ shippingRouter.patch('/:shippingId', async(req,res) => {
     }
 })
 
+/**
+* @openapi
+* /shipping/{shippingId}:
+*   delete:
+*       description: delete a shipping
+*       parameters:
+*           - name: shippingId
+*             in: path     
+*             description: id of shipping
+*             schema:
+*               type: string       
+*       responses:
+*           200: 
+*               description: Returns the deleted shipping
+*       tags:
+*           - Shipping
+*/
+shippingRouter.delete('/:shippingId', async(req,res) => {
+    try {
+        const { shippingId } = req.params;
+        if (!isValidObjectId(shippingId)) return res.status(400).send({err: "invalid shipping id"})
+        const shipping = await Shipping.findByIdAndRemove(shippingId);
+        if (!shipping) return res.status(400).send({err: "Invalid shipping id"})
+        await User.updateOne(
+            { "shippings._id":shippingId},
+            { $pull: { shippings: {_id: shippingId}}});
+        return res.send({shipping})
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({err: err.message})
+    }
+})
+
 module.exports = { shippingRouter };
