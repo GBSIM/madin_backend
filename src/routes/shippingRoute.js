@@ -97,7 +97,9 @@ shippingRouter.post('/:userId', async(req,res) => {
         if (!address) return res.status(400).send({err: "address is required"})
         if (!tag) return res.status(400).send({err: "tag is required"})
         if (!userId) return res.status(400).send({err: "userId is required"})
-        const shipping = new Shipping(req.body);
+        let user = await User.findById(userId)
+        if (!user) return res.status(400).send({err: "invalid user"})
+        const shipping = new Shipping({ ...req.body,userId});
         await Promise.all([
             shipping.save(),
             User.updateOne({ _id: userId }, { $push: {shippings: shipping}})
