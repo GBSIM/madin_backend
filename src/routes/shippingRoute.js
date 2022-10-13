@@ -25,10 +25,33 @@ shippingRouter.get('/',async(req,res) => {
     }
 })
 
+/**
+* @openapi
+* /shipping/{userId}:
+*   get:
+*       description: Get all the shippings of the specific user
+*       responses:
+*           200: 
+*               description: A JSON array of shipping
+*       tags:
+*           - Shipping
+*/
+shippingRouter.get('/:userId',async(req,res) => {
+    try {
+        const { userId } = req.params;
+        if (!isValidObjectId(userId)) return res.status(400).send({err: "invalid user id"})
+        const shipping = await Shipping.find({user: userId});
+        return res.send({shipping})
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({err: err.message})
+    }
+})
+
 
 /**
 * @openapi
-* /shipping:
+* /shipping/{userId}:
 *   post:
 *       description: register shipping information
 *       requestBody:
@@ -48,17 +71,16 @@ shippingRouter.get('/',async(req,res) => {
 *                               type: string
 *                           tag:
 *                               type: string
-*                           userId:
-*                               type: string
 *       responses:
 *           200: 
-*               description: Returns the registered user
+*               description: Returns the registered shipping
 *       tags:
-*           - User
+*           - Shipping
 */
-shippingRouter.post('/', async(req,res) => {
+shippingRouter.post('/:userId', async(req,res) => {
     try {
-        let {name, phone, address, request, tag, userId} = req.body;
+        const { userId } = req.params;
+        let {name, phone, address, request, tag} = req.body;
         if (!name) return res.status(400).send({err: "name is required"})
         if (!phone) return res.status(400).send({err: "phone is required"})
         if (!address) return res.status(400).send({err: "address is required"})
