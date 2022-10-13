@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const {User} = require('../models');
+const {User, Shipping} = require('../models');
 const { isValidObjectId } = require('mongoose');
 
 const userRouter = Router();
@@ -114,6 +114,7 @@ userRouter.delete('/:userId', async(req,res) => {
         const { userId } = req.params;
         if (!isValidObjectId(userId)) return res.status(400).send({err: "invalid user id"})
         const user = await User.findByIdAndDelete(userId);
+        await Shipping.deleteMany({ "userId":userId});
         return res.send({user})
     } catch(err) {
         console.log(err);
