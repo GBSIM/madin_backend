@@ -56,9 +56,15 @@ orderRouter.get('/:orderId',async(req,res) => {
 
 /**
 * @openapi
-* /order/{ordererId}:
+* /order/{orderId}:
 *   post:
 *       description: Order
+*       parameters:
+*           - name: orderId
+*             in: path     
+*             description: id of order
+*             schema:
+*               type: string       
 *       requestBody:
 *           required: true
 *           content:
