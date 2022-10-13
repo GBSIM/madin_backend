@@ -30,6 +30,12 @@ shippingRouter.get('/',async(req,res) => {
 * /shipping/{userId}:
 *   get:
 *       description: Get all the shippings of the specific user
+*       parameters:
+*           - name: userId
+*             in: path     
+*             description: id of the user
+*             schema:
+*               type: string
 *       responses:
 *           200: 
 *               description: A JSON array of shipping
@@ -47,7 +53,6 @@ shippingRouter.get('/:userId',async(req,res) => {
         return res.status(500).send({err: err.message})
     }
 })
-
 
 /**
 * @openapi
@@ -97,5 +102,55 @@ shippingRouter.post('/:userId', async(req,res) => {
         return res.status(500).send({err: err.message})
     }
 });
+
+/**
+* @openapi
+* /shipping/{shippingId}:
+*   patch:
+*       description: update shipping
+*       parameters:
+*           - name: shippingId
+*             in: path     
+*             description: id of the shipping
+*             schema:
+*               type: string
+*       requestBody:
+*           required: true
+*           content:
+*               application/json:
+*                   schema:
+*                       type: object
+*                       properties:
+*                           name:
+*                               type: string
+*                           phone:
+*                               type: string
+*                           address:
+*                               type: string
+*                           request:
+*                               type: string
+*                           tag:
+*                               type: string
+*       responses:
+*           200: 
+*               description:  A JSON object of updated shipping information
+*       tags:
+*           - Shipping
+*/
+shippingRouter.patch('/:shippingId', async(req,res) => {
+    try {
+        const { shippingId } = req.params;
+        const { name, phone, address, request, tag } = req.body;
+        if (!isValidObjectId(shippingId)) return res.status(400).send({err: "invalid shipping id"})
+        const shipping = await Shipping.findByIdAndUpdate(shippingId, {$set: {name, phone, address, request, tag}},{new: true});
+        await User.updateOne(
+            { 'shippings._id': shippingId }, 
+            { "shippings.$.name":name, "shippings.$.phone":phone, "shippings.$.address": address, "shippings.$.request": request, "shippings.$.tag": tag})
+        return res.send({ shipping })
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({err: err.message})
+    }
+})
 
 module.exports = { shippingRouter };
