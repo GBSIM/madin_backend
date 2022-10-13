@@ -1,5 +1,5 @@
 module.exports = { 
     ...require('./userRoute'),
-    ...require('./orderRouteCopy'),
+    ...require('./orderRoute'),
     ...require('./shippingRoute'),
  };
