@@ -7,6 +7,6 @@ const MenuClassSchema = new Schema({
     menus: [MenuSchema],
 }, {timestamps: true})
 
-const menuClass = model('menuClass',MenuClassSchema);
+const MenuClass = model('menuClass',MenuClassSchema);
 
-module.exports = { menuClass, MenuClassSchema };
+module.exports = { MenuClass, MenuClassSchema };
