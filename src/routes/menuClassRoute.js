@@ -122,4 +122,46 @@ menuClassRouter.delete('/:menuClassId', async(req,res) => {
     }
 })
 
+
+/**
+* @openapi
+* /menuclass/{menuClassId}:
+*   patch:
+*       description: Update the menu class information
+*       parameters:
+*           - name: menuClassId
+*             in: path     
+*             description: id of menu class
+*             schema:
+*               type: string
+*       requestBody:
+*           required: true
+*           content:
+*               application/json:
+*                   schema:
+*                       type: object
+*                       properties:
+*                           name:
+*                               type: string
+*                           intro:
+*                               type: string
+*       responses:
+*           200: 
+*               description: Returns the updated menu class
+*       tags:
+*           -  MenuClass
+*/
+menuClassRouter.patch('/:menuClassId', async(req,res) => {
+    try {
+        const { menuClassId } = req.params;
+        if (!isValidObjectId(menuClassId)) return res.status(400).send({err: "invalid menu class id"})
+        const { name, intro } = req.body;
+        const menuClass = await MenuClass.findByIdAndUpdate(menuClassId, {$set: {name,intro}},{new: true});
+        return res.send({menuClass})
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({err: err.message})
+    }
+})
+
 module.exports = {menuClassRouter};
