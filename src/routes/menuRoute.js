@@ -144,4 +144,54 @@ menuRouter.delete('/:menuId', async(req,res) => {
     }
 })
 
+/**
+* @openapi
+* /menu/{menuId}:
+*   patch:
+*       description: modify menu information
+*       parameters:
+*           - name: menuId
+*             in: path     
+*             description: id of the menu
+*             schema:
+*               type: string
+*       requestBody:
+*           required: true
+*           content:
+*               application/json:
+*                   schema:
+*                       type: object
+*                       properties:
+*                           name:
+*                               type: string
+*                           price:
+*                               type: number
+*                           tag:
+*                               type: string
+*                           pickupEn:
+*                               type: boolean
+*                           deliveryEn:
+*                               type: boolean
+*       responses:
+*           200: 
+*               description:  A JSON object of modified menu
+*       tags:
+*           - Menu
+*/
+menuRouter.patch('/:menuId', async(req,res) => {
+    try {
+        const { menuId } = req.params;
+        const { name, price, tag, pickupEn, deliveryEn } = req.body;
+        if (!isValidObjectId(menuId)) return res.status(400).send({err: "invalid menu id"})
+        const menu = await Menu.findByIdAndUpdate(menuId, {$set: {name, price, tag, pickupEn, deliveryEn}},{new: true});
+        await MenuClass.updateOne(
+            { 'menus._id': menuId }, 
+            { "menus.$.name":name, "menus.$.price":price, "menus.$.tag": tag, "menus.$.pickupEn": pickupEn, "menus.$.deliveryEn": deliveryEn,})
+        return res.send({menu})
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({err: err.message})
+    }
+})
+
 module.exports = {menuRouter};
