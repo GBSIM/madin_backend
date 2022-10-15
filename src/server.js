@@ -3,7 +3,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const mongoose = require('mongoose');
 const env = require('dotenv');
-const {userRouter, orderRouter, shippingRouter, menuClassRouter} = require('./routes');
+const {userRouter, orderRouter, shippingRouter, menuClassRouter, menuRouter} = require('./routes');
 env.config();
 
 const app = express();
@@ -34,6 +34,7 @@ const server = async() => {
         
         app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpec));
         app.use('/menuclass',menuClassRouter);
+        app.use('/menu',menuRouter);
         app.use('/order',orderRouter);
         app.use('/user',userRouter);
         app.use('/shipping',shippingRouter);

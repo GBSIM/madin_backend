@@ -25,7 +25,6 @@ menuClassRouter.get('/',async(req,res) => {
     }
 });
 
-
 /**
 * @openapi
 * /menuclass/{menuClassId}:

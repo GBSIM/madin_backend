@@ -3,4 +3,5 @@ module.exports = {
     ...require('./orderRoute'),
     ...require('./shippingRoute'),
     ...require('./menuClassRoute'),
+    ...require('./menuRoute'),
  };
