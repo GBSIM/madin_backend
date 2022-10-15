@@ -168,6 +168,8 @@ menuRouter.delete('/:menuId', async(req,res) => {
 *                               type: number
 *                           tag:
 *                               type: string
+*                           stock:
+*                               type: number
 *                           pickupEn:
 *                               type: boolean
 *                           deliveryEn:
@@ -181,12 +183,15 @@ menuRouter.delete('/:menuId', async(req,res) => {
 menuRouter.patch('/:menuId', async(req,res) => {
     try {
         const { menuId } = req.params;
-        const { name, price, tag, pickupEn, deliveryEn } = req.body;
+        const { name, price, tag, pickupEn, deliveryEn, stock } = req.body;
         if (!isValidObjectId(menuId)) return res.status(400).send({err: "invalid menu id"})
         const menu = await Menu.findByIdAndUpdate(menuId, {$set: {name, price, tag, pickupEn, deliveryEn}},{new: true});
         await MenuClass.updateOne(
             { 'menus._id': menuId }, 
-            { "menus.$.name":name, "menus.$.price":price, "menus.$.tag": tag, "menus.$.pickupEn": pickupEn, "menus.$.deliveryEn": deliveryEn,})
+            { "menus.$.name":name, "menus.$.price":price, 
+              "menus.$.tag": tag, "menus.$.pickupEn": pickupEn, 
+              "menus.$.deliveryEn": deliveryEn,
+              "menus.$.stock": stock})
         return res.send({menu})
     } catch(err) {
         console.log(err);
