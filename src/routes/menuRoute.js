@@ -110,4 +110,38 @@ menuRouter.post('/', async(req,res) => {
     }
 });
 
+
+/**
+* @openapi
+* /menu/{menuId}:
+*   delete:
+*       description: delete an menu
+*       parameters:
+*           - name: menuId
+*             in: path     
+*             description: id of menu
+*             schema:
+*               type: string       
+*       responses:
+*           200: 
+*               description: Returns the deleted menu
+*       tags:
+*           - Menu
+*/
+menuRouter.delete('/:menuId', async(req,res) => {
+    try {
+        const { menuId } = req.params;
+        if (!isValidObjectId(menuId)) return res.status(400).send({err: "invalid menu id"})
+        const menu = await Menu.findByIdAndRemove(menuId);
+        if (!menu) return res.status(400).send({err: "Invalid menu"})
+        await MenuClass.updateOne(
+            { "menus._id":menuId},
+            { $pull: { menus: {_id: menuId}}});
+        return res.send({menu})
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({err: err.message})
+    }
+})
+
 module.exports = {menuRouter};
