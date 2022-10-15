@@ -29,7 +29,7 @@ menuClassRouter.get('/',async(req,res) => {
 * @openapi
 * /menuclass/{menuClassId}:
 *   get:
-*       description: Get all the shippings of the specific user
+*       description: Get the menu class by id
 *       parameters:
 *           - name: menuClassId
 *             in: path     
@@ -58,7 +58,7 @@ menuClassRouter.get('/:menuClassId',async(req,res) => {
 * @openapi
 * /menuclass:
 *   post:
-*       description: register shipping information
+*       description: add menu class
 *       requestBody:
 *           required: true
 *           content:
@@ -89,7 +89,6 @@ menuClassRouter.post('/', async(req,res) => {
         return res.status(500).send({err: err.message})
     }
 });
-
 
 /**
 * @openapi
