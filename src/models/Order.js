@@ -1,7 +1,8 @@
 const { Schema, model, Types:{ ObjectId } } = require('mongoose');
+const { MenuSchema } = require('./Menu');
 
 const OrderSchema = new Schema({
-    product: { type: Array, required: true},
+    menus: [MenuSchema],
     orderer: {
         _id: {type: ObjectId, required: true, ref: "user"},
         username: {type: String, required: true},
