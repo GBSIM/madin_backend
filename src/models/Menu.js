@@ -12,6 +12,7 @@ const MenuSchema = new Schema({
     pickupEn: {type: Boolean, required: true, default: false},
     deliveryEn: {type: Boolean, required: true, default: false},
     quantity: Number,
+    imageUrl: String
 }, {timestamps: true})
 
 const Menu = model('menu',MenuSchema);
