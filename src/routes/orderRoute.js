@@ -126,17 +126,17 @@ orderRouter.post('/:ordererId', async(req,res) => {
         const order = new Order({ ...req.body,orderer,shipping});
         menuIdArray.map(async(menuId,index) => { 
             let menu = await Menu.findById(menuId);
+            if (!menu) return res.status(400).send({err: "invalid menu"})
             menu.quantity = menuQuantityArray[index];
             order.menus.push(menu);
             if (index === (menuIdArray.length-1)) {
-                console.log(order);
                 await Promise.all([
                     order.save(),
                     User.updateOne({ _id: ordererId }, { $push: { orders: order }})
                 ]);
+                return res.send({order})
             }
         })
-        return res.send({order})
     } catch(err) {
         console.log(err);
         return res.status(500).send({err: err.message})

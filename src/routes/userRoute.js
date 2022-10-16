@@ -124,13 +124,13 @@ userRouter.delete('/:userId', async(req,res) => {
 
 /**
 * @openapi
-* /user/{code}:
+* /user/{userId}:
 *   patch:
 *       description: Update the user's information
 *       parameters:
-*           - name: code
+*           - name: userId
 *             in: path     
-*             description: code of user
+*             description: id of user
 *             schema:
 *               type: string
 *       requestBody:
@@ -154,11 +154,12 @@ userRouter.delete('/:userId', async(req,res) => {
 *       tags:
 *           - User
 */
-userRouter.patch('/:code', async(req,res) => {
+userRouter.patch('/:userId', async(req,res) => {
     try {
-        const { code } = req.params;
+        const { userId } = req.params;
+        if (!isValidObjectId(userId)) return res.status(400).send({err: "invalid user id"})
         const { profileImageUrl, email, phone, username } = req.body;
-        const user = await User.findOneAndUpdate({code: code}, {$set: {profileImageUrl,email,phone,username}},{new: true});
+        const user = await User.findOneAndUpdate({_id: userId}, {$set: {profileImageUrl,email,phone,username}},{new: true});
         return res.send({user})
     } catch(err) {
         console.log(err);
