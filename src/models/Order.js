@@ -18,7 +18,6 @@ const OrderSchema = new Schema({
         tag: {type: String, required: true},
     },
     mileageUse: {type: Number, required: true, default: 0},
-    coupon: {type: ObjectId, ref: "coupon"},
     payment: {type: String, required: true},
     deliveryDate: {type: Date},
     pickupDate: {type: Date},

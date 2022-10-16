@@ -107,7 +107,7 @@ orderRouter.get('/:orderId',async(req,res) => {
 orderRouter.post('/:ordererId', async(req,res) => {
     try {
         const { ordererId } = req.params;
-        let {shippingId, mileageUse, coupon, payment, orderPrice, 
+        let {shippingId, mileageUse, payment, orderPrice, 
              payedMoney, menuIdArray, menuQuantityArray} = req.body;
         if (!ordererId) return res.status(400).send({err: "ordererId is required"})
         if (!isValidObjectId(ordererId)) return res.status(400).send({err: "invalid ordererId id"})
