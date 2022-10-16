@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { User, Order, Shipping } = require('../models');
+const { User, Order, Shipping, Menu } = require('../models');
 const { isValidObjectId } = require('mongoose');
 
 const orderRouter = Router();
@@ -72,10 +72,16 @@ orderRouter.get('/:orderId',async(req,res) => {
 *                   schema:
 *                       type: object
 *                       properties:
-*                           product:
+*                           menuIdArray:
 *                               type: array
 *                               items:
-*                                   type: object
+*                                   type: string
+*                           menuQuantityArray:
+*                               type: array
+*                               items:
+*                                   type: number
+*                           menuQantityArray:
+*                               type: array
 *                           shippingId:
 *                               type: string
 *                           mileageUse:
@@ -101,10 +107,13 @@ orderRouter.get('/:orderId',async(req,res) => {
 orderRouter.post('/:ordererId', async(req,res) => {
     try {
         const { ordererId } = req.params;
-        let {product, shippingId, mileageUse, coupon, payment, orderPrice, payedMoney} = req.body;
-        if (!product) return res.status(400).send({err: "product is required"})
+        let {shippingId, mileageUse, coupon, payment, orderPrice, 
+             payedMoney, menuIdArray, menuQuantityArray} = req.body;
         if (!ordererId) return res.status(400).send({err: "ordererId is required"})
         if (!isValidObjectId(ordererId)) return res.status(400).send({err: "invalid ordererId id"})
+        if (!menuIdArray) return res.status(400).send({err: "menuIdArray is required"})
+        if (!menuQuantityArray) return res.status(400).send({err: "menuQuantityArray is required"})
+        if (menuIdArray.length != menuQuantityArray.length) return res.status(400).send({err: "The sizes o menuIdArray and menuQuantityArray must be the same"})
         if (!shippingId) return res.status(400).send({err: "shippingId is required"})
         if (!payment) return res.status(400).send({err: "payment is required"})
         let orderer = await User.findById(ordererId)
@@ -114,11 +123,19 @@ orderRouter.post('/:ordererId', async(req,res) => {
         if (mileageUse > orderer.mileage) return res.status(400).send({err: "mileage use should not be more than the order's mileage"})
         let shipping = await Shipping.findById(shippingId);
         if (!shipping) return res.status(400).send({err: "invalid shipping"})
-        const order = new Order({ ...req.body,orderer,shipping });
-        await Promise.all([
-            order.save(),
-            User.updateOne({ _id: ordererId }, { $push: { orders: order }})
-        ]);
+        const order = new Order({ ...req.body,orderer,shipping});
+        menuIdArray.map(async(menuId,index) => { 
+            let menu = await Menu.findById(menuId);
+            menu.quantity = menuQuantityArray[index];
+            order.menus.push(menu);
+            if (index === (menuIdArray.length-1)) {
+                console.log(order);
+                await Promise.all([
+                    order.save(),
+                    User.updateOne({ _id: ordererId }, { $push: { orders: order }})
+                ]);
+            }
+        })
         return res.send({order})
     } catch(err) {
         console.log(err);
