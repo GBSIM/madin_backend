@@ -7,7 +7,9 @@ const {userRouter, orderRouter, shippingRouter, menuClassRouter, menuRouter} = r
 env.config();
 
 const app = express();
+const cors = require('cors');
 app.use(express.json());
+app.use(cors());
 
 const MONGO_URI = 'mongodb+srv://' + 
                   process.env.MONGODB_USER + ':' + 
