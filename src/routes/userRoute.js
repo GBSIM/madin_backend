@@ -128,8 +128,6 @@ userRouter.post('/kakao', async(req,res) => {
         const queryStringBody = Object.keys(bodyData)
             .map(k=> encodeURIComponent(k)+"="+encodeURI(bodyData[k]))
             .join("&")
-        
-        console.log(queryStringBody);
 
         const responseToken = await post('https://kauth.kakao.com/oauth/token',
             queryStringBody
@@ -142,6 +140,16 @@ userRouter.post('/kakao', async(req,res) => {
                 Authorization: `Bearer ${accessToken}`,
             },
         });
+
+        let id = 'kakao_'+responseUserInfo.data.id;
+        let username = responseUserInfo.data.properties.nickname;
+        let email = responseUserInfo.data.kakao_account.email;
+
+        const user = await User.findOne({code: id});
+        if (!user) {
+            const newUser = new User({code: id, username, email});
+            await newUser.save();
+        }
 
         return res.send({accessToken})
     } catch(err) {
