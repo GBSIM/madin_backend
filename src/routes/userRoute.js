@@ -121,25 +121,29 @@ userRouter.post('/kakao', async(req,res) => {
 
         const bodyData = {
             grant_type : "authorization_code",
-            client_id : 'c49e9d7fad13c64229c3899523a2ba6b',
+            client_id : "c49e9d7fad13c64229c3899523a2ba6b",
             redirect_uri : redirectUri,
             code : code
         }
         const queryStringBody = Object.keys(bodyData)
             .map(k=> encodeURIComponent(k)+"="+encodeURI(bodyData[k]))
             .join("&")
+        
+        console.log(queryStringBody);
 
-        const accessToken = await post('https://kauth.kakao.com/oauth/token',
-            queryStringBody,
+        const responseToken = await post('https://kauth.kakao.com/oauth/token',
+            queryStringBody
         );
 
-        const kakaoUser = await get('https://kapi.kakao.com/v2/user/me', {
+        let accessToken = responseToken.data.access_token;
+
+        const responseUserInfo = await get('https://kapi.kakao.com/v2/user/me', {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },
         });
 
-        return res.send({accessToken,kakaoUser})
+        return res.send({accessToken})
     } catch(err) {
         console.log(err);
         return res.status(500).send({err: err.message})
