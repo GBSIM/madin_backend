@@ -254,6 +254,8 @@ userRouter.delete('/:userId', async(req,res) => {
 *                               type: string
 *                           username:
 *                               type: string
+*                           token:
+*                               type: string       
 *       responses:
 *           200: 
 *               description: Returns the updated user
@@ -264,8 +266,14 @@ userRouter.patch('/:userId', async(req,res) => {
     try {
         const { userId } = req.params;
         if (!isValidObjectId(userId)) return res.status(400).send({err: "invalid user id"})
-        const { profileImageUrl, email, phone, username } = req.body;
-        const user = await User.findOneAndUpdate({_id: userId}, {$set: {profileImageUrl,email,phone,username}},{new: true});
+        const { profileImageUrl, email, phone, username, token } = req.body;
+        let user;
+        user = await User.findById(userId);
+        if (!user) return res.status(400).send({err: "no matched user"})
+        if ( user.token !== token) return res.status(400).send({err: "token is wrong"})
+        const currentTime = new Date();
+        if ((user.token === token) && (currentTime > user.tokenExpiration)) return res.status(400).send({err: "token is expired"})
+        user = await User.findOneAndUpdate({_id: userId}, {$set: {profileImageUrl,email,phone,username}},{new: true});
         return res.send({user})
     } catch(err) {
         console.log(err);
