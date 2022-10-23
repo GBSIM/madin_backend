@@ -70,7 +70,7 @@ userRouter.get('/:code', async(req,res) => {
 *                               type: string
 *                           email:
 *                               type: string
-*                           code:
+*                           socialId:
 *                               type: string
 *       responses:
 *           200: 
@@ -83,7 +83,7 @@ userRouter.post('/', async(req,res) => {
         let {username, email, code} = req.body;
         if (!username) return res.status(400).send({err: "username is required"})
         if (!email) return res.status(400).send({err: "email is required"})
-        if (!code) return res.status(400).send({err: "code is required"})
+        if (!socialId) return res.status(400).send({err: "code is required"})
         const user = new User(req.body);
         await user.save();
         return res.send({user})
@@ -143,17 +143,18 @@ userRouter.post('/kakao', async(req,res) => {
             },
         });
 
-        let id = 'kakao_'+responseUserInfo.data.id;
+        let socialId = 'kakao_'+responseUserInfo.data.id;
         let username = responseUserInfo.data.properties.nickname;
         let email = responseUserInfo.data.kakao_account.email;
 
-        const user = await User.findOne({code: id});
+        let user
+        user = await User.findOne({code: id});
         if (!user) {
-            const newUser = new User({code: id, username, email});
-            await newUser.save();
+            user = new User({code: socialId, username, email});
+            await user.save();
         }
 
-        return res.send({accessToken})
+        return res.send({user})
     } catch(err) {
         console.log(err);
         return res.status(500).send({err: err.message})
@@ -236,33 +237,3 @@ userRouter.patch('/:userId', async(req,res) => {
 })
 
 module.exports = {userRouter};
-
-const KakaoRedirectHandler = (code,redirectUri) => {
-    let grant_type = "authorization_code";
-    let client_id = "c49e9d7fad13c64229c3899523a2ba6b";
-
-    axios.post(`https://kauth.kakao.com/oauth/token?grant_type=${grant_type}&client_id=${client_id}&redirect_uri=${redirectUri}&code=${code}`
-        , {
-    headers: {
-        'Content-type': 'application/x-www-form-urlencoded;charset=utf-8'
-        }
-    }).then((res) => {
-        window.Kakao.Auth.setAccessToken(res.data.access_token);
-        window.Kakao.API.request({
-            url: "/v2/user/me",
-    }).then(async(data) => {
-        const userGetResponse = await axios.get('https://api.madinbakery.com/user/'+data.id);
-        window.history.replaceState({}, null, window.location.pathname);
-        if (!userGetResponse.data.user) {
-        await axios.post('https://api.madinbakery.com/user',{
-            "code": data.id,
-            "username": data.properties.nickname,
-            "email": data.kakao_account.email
-        }).then((res) => {
-            console.log(res);
-        }).catch((err) => {
-            console.log(err);
-        })}
-        }       
-    )})
-};

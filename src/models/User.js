@@ -7,7 +7,7 @@ const UserSchema = new Schema({
     email: { type: String, required: true, unique: true},
     phone: { type: String, required: true, default: "01000000000"},
     profileImageUrl: String,
-    code: { type: String, required: true, unique: true},
+    socialId: { type: String, required: true, unique: true},
     mileage: { type: Number, required: true, default: 0},
     shippings: [ShippingSchema],
     orders: [OrderSchema],
