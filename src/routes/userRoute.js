@@ -107,6 +107,8 @@ userRouter.post('/', async(req,res) => {
 *                       properties:
 *                           code:
 *                               type: string
+*                           redirectUri:
+*                               type: string
 *       responses:
 *           200: 
 *               description: Returns the logined user
