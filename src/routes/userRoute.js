@@ -148,9 +148,9 @@ userRouter.post('/kakao', async(req,res) => {
         let email = responseUserInfo.data.kakao_account.email;
 
         let user
-        user = await User.findOne({code: id});
+        user = await User.findOne({socialId: socialId});
         if (!user) {
-            user = new User({code: socialId, username, email});
+            user = new User({socialId, username, email});
             await user.save();
         }
 
