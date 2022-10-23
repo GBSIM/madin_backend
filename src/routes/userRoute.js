@@ -2,7 +2,7 @@ const { Router } = require('express');
 const {User, Shipping} = require('../models');
 const { isValidObjectId } = require('mongoose');
 const { get, post } = require('axios');
-const { jwt } = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 const userRouter = Router();
 
@@ -156,7 +156,8 @@ userRouter.post('/kakao', async(req,res) => {
         }
         var token = jwt.sign(user._id.toHexString(), 'secretToken');
         user.token = token;
-        user.tokenExpiration = new Date();
+        const currentTime = new Date();
+        user.tokenExpiration = currentTime.setHours(currentTime.getHours() + 2);
         await user.save();
 
         return res.send({user})
