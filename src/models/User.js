@@ -11,6 +11,8 @@ const UserSchema = new Schema({
     mileage: { type: Number, required: true, default: 0},
     shippings: [ShippingSchema],
     orders: [OrderSchema],
+    token: String,
+    tokenExpiration: Date,
 }, {timestamps: true})
 
 const User = model('user',UserSchema);
