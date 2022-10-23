@@ -110,7 +110,7 @@ userRouter.post('/', async(req,res) => {
 
 /**
 * @openapi
-* /user/kakao:
+* /user/kakaologin:
 *   post:
 *       description: login with kakao social login service
 *       requestBody:
@@ -130,7 +130,7 @@ userRouter.post('/', async(req,res) => {
 *       tags:
 *           - User
 */
-userRouter.post('/kakao', async(req,res) => {
+userRouter.post('/kakaologin', async(req,res) => {
     try {
         let {code,redirectUri} = req.body;
         if (!code) return res.status(400).send({err: "code is required"})
@@ -192,6 +192,15 @@ userRouter.post('/kakao', async(req,res) => {
 *             description: id of user
 *             schema:
 *               type: string       
+*       requestBody:
+*           required: true
+*           content:
+*               application/json:
+*                   schema:
+*                       type: object
+*                       properties:
+*                           token:
+*                               type: string       
 *       responses:
 *           200: 
 *               description: Returns the deleted user
@@ -201,8 +210,16 @@ userRouter.post('/kakao', async(req,res) => {
 userRouter.delete('/:userId', async(req,res) => {
     try {
         const { userId } = req.params;
+        const { token } = req.body;
         if (!isValidObjectId(userId)) return res.status(400).send({err: "invalid user id"})
-        const user = await User.findByIdAndDelete(userId);
+        if (!token) return res.status(400).send({err: "token is required"})
+        // const user = await User.findByIdAndDelete(userId);
+        const user = await User.findById(userId);
+        if (!user) return res.status(400).send({err: "no matched user"})
+        if ( user.token !== token) return res.status(400).send({err: "token is wrong"})
+        const currentTime = new Date();
+        if ((user.token === token) && (currentTime > user.tokenExpiration)) return res.status(400).send({err: "token is expired"})
+        await user.delete();
         await Shipping.deleteMany({ "userId":userId});
         return res.send({user})
     } catch(err) {
