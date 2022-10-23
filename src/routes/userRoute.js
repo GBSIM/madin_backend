@@ -29,25 +29,39 @@ userRouter.get('/',async(req,res) => {
 
 /**
 * @openapi
-* /user/{code}:
-*   get:
-*       description: Get user by id code
+* /user/{socialId}:
+*   post:
+*       description: Get user by social id
 *       parameters:
-*           - name: code
+*           - name: socialId
 *             in: path     
-*             description: code of user
+*             description: social id of user
 *             schema:
-*               type: string         
+*               type: string
+*       requestBody:
+*           required: true
+*           content:
+*               application/json:
+*                   schema:
+*                       type: object
+*                       properties:
+*                           token:
+*                               type: string       
 *       responses:
 *           200: 
 *               description: A JSON object of user
 *       tags:
 *           - User
 */
-userRouter.get('/:code', async(req,res) => {
+userRouter.post('/:socialId', async(req,res) => {
     try {
-        const { code } = req.params;
-        const user = await User.findOne({code: code});
+        const { socialId } = req.params;
+        const { token } = req.body;
+        const user = await User.findOne({socialId: socialId});
+        if (!user) return res.status(400).send({err: "no matched user"})
+        if ( user.token !== token) return res.status(400).send({err: "token is wrong"})
+        const currentTime = new Date();
+        if ((user.token === token) && (currentTime > user.tokenExpiration)) return res.status(400).send({err: "token is expired"})
         return res.send({user})
     } catch(err) {
         console.log(err);
