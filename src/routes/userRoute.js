@@ -29,7 +29,7 @@ userRouter.get('/',async(req,res) => {
 
 /**
 * @openapi
-* /user/{socialId}:
+* /user/auth/{socialId}:
 *   post:
 *       description: Get user by social id
 *       parameters:
@@ -53,7 +53,7 @@ userRouter.get('/',async(req,res) => {
 *       tags:
 *           - User
 */
-userRouter.post('/:socialId', async(req,res) => {
+userRouter.post('auth/:socialId', async(req,res) => {
     try {
         const { socialId } = req.params;
         const { token } = req.body;
