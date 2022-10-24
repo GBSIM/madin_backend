@@ -168,6 +168,9 @@ userRouter.post('/kakaologin', async(req,res) => {
         if (!user) {
             user = new User({socialId, name, email, socialToken});
             await user.save();
+        } else {
+            user.socialToken = socialToken;
+            await user.save();
         }
         var token = jwt.sign(user._id.toHexString(), 'secretToken');
         user.token = token;
