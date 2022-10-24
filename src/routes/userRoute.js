@@ -184,6 +184,47 @@ userRouter.post('/kakaologin', async(req,res) => {
 
 /**
 * @openapi
+* /user/kakaologout:
+*   post:
+*       description: logout with kakao social login service
+*       requestBody:
+*           required: true
+*           content:
+*               application/json:
+*                   schema:
+*                       type: object
+*                       properties:
+*                           accessToken:
+*                               type: string
+*       responses:
+*           200: 
+*               description: Returns the logined user
+*       tags:
+*           - User
+*/
+userRouter.post('/kakaologout', async(req,res) => {
+    try {
+        let { accessToken } = req.body;
+        if (!accessToken) return res.status(400).send({err: "accessToken is required"})
+
+        const responseLogout = await post('https://kapi.kakao.com/v1/user/logout',
+            {header: {
+                Authorization: `Bearer ${accessToken}`
+                }
+            }
+        );
+
+        console.log(responseLogout);
+
+        return res.send({responseLogout})
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({err: err.message})
+    }
+});
+
+/**
+* @openapi
 * /user/{userId}:
 *   delete:
 *       description: delete user's information
