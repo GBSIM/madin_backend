@@ -150,7 +150,8 @@ userRouter.post('/kakaologin', async(req,res) => {
             queryStringBody
         );
 
-        let accessToken = responseToken.data.access_token;
+        const accessToken = responseToken.data.access_token;
+        const socialToken = accessToken; 
 
         const responseUserInfo = await get('https://kapi.kakao.com/v2/user/me', {
             headers: {
@@ -165,7 +166,7 @@ userRouter.post('/kakaologin', async(req,res) => {
         let user
         user = await User.findOne({socialId: socialId});
         if (!user) {
-            user = new User({socialId, name, email, socialToken: accessToken});
+            user = new User({socialId, name, email, socialToken});
             await user.save();
         }
         var token = jwt.sign(user._id.toHexString(), 'secretToken');
