@@ -81,7 +81,7 @@ userRouter.post('/auth/:socialId', async(req,res) => {
 *                   schema:
 *                       type: object
 *                       properties:
-*                           username:
+*                           name:
 *                               type: string
 *                           email:
 *                               type: string
@@ -95,8 +95,8 @@ userRouter.post('/auth/:socialId', async(req,res) => {
 */
 userRouter.post('/', async(req,res) => {
     try {
-        let {username, email, code} = req.body;
-        if (!username) return res.status(400).send({err: "username is required"})
+        let {name, email, code} = req.body;
+        if (!name) return res.status(400).send({err: "name is required"})
         if (!email) return res.status(400).send({err: "email is required"})
         if (!socialId) return res.status(400).send({err: "code is required"})
         const user = new User(req.body);
@@ -159,13 +159,13 @@ userRouter.post('/kakaologin', async(req,res) => {
         });
 
         let socialId = 'kakao_'+responseUserInfo.data.id;
-        let username = responseUserInfo.data.properties.nickname;
+        let name = responseUserInfo.data.properties.nickname;
         let email = responseUserInfo.data.kakao_account.email;
 
         let user
         user = await User.findOne({socialId: socialId});
         if (!user) {
-            user = new User({socialId, username, email});
+            user = new User({socialId, name, email});
             await user.save();
         }
         var token = jwt.sign(user._id.toHexString(), 'secretToken');
@@ -252,7 +252,7 @@ userRouter.delete('/:userId', async(req,res) => {
 *                               type: string
 *                           phone:
 *                               type: string
-*                           username:
+*                           name:
 *                               type: string
 *                           token:
 *                               type: string       
@@ -266,14 +266,14 @@ userRouter.patch('/:userId', async(req,res) => {
     try {
         const { userId } = req.params;
         if (!isValidObjectId(userId)) return res.status(400).send({err: "invalid user id"})
-        const { profileImageUrl, email, phone, username, token } = req.body;
+        const { profileImageUrl, email, phone, name, token } = req.body;
         let user;
         user = await User.findById(userId);
         if (!user) return res.status(400).send({err: "no matched user"})
         if ( user.token !== token) return res.status(400).send({err: "token is wrong"})
         const currentTime = new Date();
         if ((user.token === token) && (currentTime > user.tokenExpiration)) return res.status(400).send({err: "token is expired"})
-        user = await User.findOneAndUpdate({_id: userId}, {$set: {profileImageUrl,email,phone,username}},{new: true});
+        user = await User.findOneAndUpdate({_id: userId}, {$set: {profileImageUrl,email,phone,name}},{new: true});
         return res.send({user})
     } catch(err) {
         console.log(err);
