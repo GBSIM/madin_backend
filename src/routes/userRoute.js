@@ -211,7 +211,7 @@ userRouter.post('/kakaologout', async(req,res) => {
         if (!accessToken) return res.status(400).send({err: "accessToken is required"})
 
         const responseLogout = await post('https://kapi.kakao.com/v1/user/logout',
-            {header: {
+            {headers: {
                 Authorization: `Bearer ${accessToken}`
                 }
             }
