@@ -197,7 +197,7 @@ userRouter.post('/kakaologin', async(req,res) => {
 *                   schema:
 *                       type: object
 *                       properties:
-*                           accessToken:
+*                           socialId:
 *                               type: string
 *       responses:
 *           200: 
@@ -207,19 +207,27 @@ userRouter.post('/kakaologin', async(req,res) => {
 */
 userRouter.post('/kakaologout', async(req,res) => {
     try {
-        let { accessToken } = req.body;
-        if (!accessToken) return res.status(400).send({err: "accessToken is required"})
+        let { socialId } = req.body;
+        if (!socialId) return res.status(400).send({err: "social id is required"})
+        
+        const user = await User.findOne({socialId: socialId});
+        if (!user) return res.status(400).send({err: "invalid social id"})
+        if (!user.socialToken) return res.status(400).send({err: "accessToken does not exist in user db"})
 
-        const responseLogout = await post('https://kapi.kakao.com/v1/user/logout',
-            {headers: {
-                Authorization: `Bearer ${accessToken}`
-                }
-            }
-        );
+        const responseLogout = await post('https://kapi.kakao.com/v1/user/logout',{},{
+            headers: {
+                Authorization: `Bearer ${user.socialToken}`,
+                
+            },
+        });
+        if (socialId !== ("kakao_" + responseLogout.data.id)) return res.status(400).send({err: "logout failed"})
+        
+        user.socialToken = "";
+        user.token = "";
+        user.tokenExpiration = "";
+        await user.save();
 
-        console.log(responseLogout);
-
-        return res.send({responseLogout})
+        return res.send({user})
     } catch(err) {
         console.log(err);
         return res.status(500).send({err: err.message})
