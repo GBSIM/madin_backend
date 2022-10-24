@@ -165,7 +165,7 @@ userRouter.post('/kakaologin', async(req,res) => {
         let user
         user = await User.findOne({socialId: socialId});
         if (!user) {
-            user = new User({socialId, name, email});
+            user = new User({socialId, name, email, socialToken: accessToken});
             await user.save();
         }
         var token = jwt.sign(user._id.toHexString(), 'secretToken');
@@ -213,7 +213,6 @@ userRouter.delete('/:userId', async(req,res) => {
         const { token } = req.body;
         if (!isValidObjectId(userId)) return res.status(400).send({err: "invalid user id"})
         if (!token) return res.status(400).send({err: "token is required"})
-        // const user = await User.findByIdAndDelete(userId);
         const user = await User.findById(userId);
         if (!user) return res.status(400).send({err: "no matched user"})
         if ( user.token !== token) return res.status(400).send({err: "token is wrong"})

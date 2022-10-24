@@ -12,6 +12,7 @@ const UserSchema = new Schema({
     shippings: [ShippingSchema],
     orders: [OrderSchema],
     token: String,
+    socialToken: String,
     tokenExpiration: Date,
 }, {timestamps: true})
 
