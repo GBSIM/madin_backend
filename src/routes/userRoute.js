@@ -95,12 +95,13 @@ userRouter.post('/auth/:socialId', async(req,res) => {
 */
 userRouter.post('/', async(req,res) => {
     try {
-        let {name, email, code} = req.body;
+        let {name, email, socialId} = req.body;
         if (!name) return res.status(400).send({err: "name is required"})
         if (!email) return res.status(400).send({err: "email is required"})
-        if (!socialId) return res.status(400).send({err: "code is required"})
+        if (!socialId) return res.status(400).send({err: "socialId is required"})
         const user = new User(req.body);
         await user.save();
+        user.socialToken = "";
         return res.send({user})
     } catch(err) {
         console.log(err);
@@ -177,7 +178,7 @@ userRouter.post('/kakaologin', async(req,res) => {
         const currentTime = new Date();
         user.tokenExpiration = currentTime.setHours(currentTime.getHours() + 2);
         await user.save();
-
+        user.socialToken = "";
         return res.send({user})
     } catch(err) {
         console.log(err);
@@ -201,7 +202,7 @@ userRouter.post('/kakaologin', async(req,res) => {
 *                               type: string
 *       responses:
 *           200: 
-*               description: Returns the logined user
+*               description: Returns the logoutted user
 *       tags:
 *           - User
 */
@@ -326,6 +327,7 @@ userRouter.patch('/:userId', async(req,res) => {
         const currentTime = new Date();
         if ((user.token === token) && (currentTime > user.tokenExpiration)) return res.status(400).send({err: "token is expired"})
         user = await User.findOneAndUpdate({_id: userId}, {$set: {profileImageUrl,email,phone,name}},{new: true});
+        user.tokenExpiration = "";
         return res.send({user})
     } catch(err) {
         console.log(err);
