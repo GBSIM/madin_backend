@@ -62,6 +62,7 @@ userRouter.post('/auth/:socialId', async(req,res) => {
         if ( user.token !== token) return res.status(400).send({err: "token is wrong"})
         const currentTime = new Date();
         if ((user.token === token) && (currentTime > user.tokenExpiration)) return res.status(400).send({err: "token is expired"})
+        user.socialToken = "";
         return res.send({user})
     } catch(err) {
         console.log(err);
@@ -327,7 +328,7 @@ userRouter.patch('/:userId', async(req,res) => {
         const currentTime = new Date();
         if ((user.token === token) && (currentTime > user.tokenExpiration)) return res.status(400).send({err: "token is expired"})
         user = await User.findOneAndUpdate({_id: userId}, {$set: {profileImageUrl,email,phone,name}},{new: true});
-        user.tokenExpiration = "";
+        user.socialToken = "";
         return res.send({user})
     } catch(err) {
         console.log(err);
