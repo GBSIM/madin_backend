@@ -174,9 +174,10 @@ userRouter.post('/kakaologin', async(req,res) => {
             user.socialToken = socialToken;
             await user.save();
         }
-        var token = await jwt.sign(user._id.toHexString(), 'secretToken');
-        user.token = token;
+        
         const currentTime = new Date();
+        var token = await jwt.sign(user._id.toHexString() + currentTime.toString(), 'secretToken');
+        user.token = token;
         user.tokenExpiration = currentTime.setHours(currentTime.getHours() + 2);
         await user.save();
         user.socialToken = "";
