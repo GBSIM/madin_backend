@@ -84,6 +84,8 @@ shippingRouter.get('/:userId',async(req,res) => {
 *                               type: string
 *                           tag:
 *                               type: string
+*                           token:
+*                               type: string
 *       responses:
 *           200: 
 *               description: Returns the registered shipping
@@ -93,14 +95,16 @@ shippingRouter.get('/:userId',async(req,res) => {
 shippingRouter.post('/:userId', async(req,res) => {
     try {
         const { userId } = req.params;
-        let {name, phone, basicAddress, detailAddress, request, tag} = req.body;
+        let {name, phone, basicAddress, detailAddress, request, tag, token} = req.body;
         if (!name) return res.status(400).send({err: "name is required"})
         if (!phone) return res.status(400).send({err: "phone is required"})
         if (!basicAddress) return res.status(400).send({err: "basicAddress is required"})
         if (!detailAddress) return res.status(400).send({err: "detailAddress is required"})
         if (!userId) return res.status(400).send({err: "userId is required"})
+        if (!token) return res.status(400).send({err: "token is required"})
         let user = await User.findById(userId)
         if (!user) return res.status(400).send({err: "invalid user"})
+        if (user.token !== token) return res.status(400).send({err: "token is invalid"})
         const shipping = new Shipping({ ...req.body,userId});
         await Promise.all([
             shipping.save(),
@@ -143,6 +147,8 @@ shippingRouter.post('/:userId', async(req,res) => {
 *                               type: string
 *                           tag:
 *                               type: string
+*                           token:
+*                               type: string
 *       responses:
 *           200: 
 *               description:  A JSON object of updated shipping information
@@ -152,9 +158,12 @@ shippingRouter.post('/:userId', async(req,res) => {
 shippingRouter.patch('/:shippingId', async(req,res) => {
     try {
         const { shippingId } = req.params;
-        const { name, phone, basicAddress, detailAddress, request, tag } = req.body;
+        const { name, phone, basicAddress, detailAddress, request, tag, token } = req.body;
+        if (!token) return res.status(400).send({err: "token is required"})
         if (!isValidObjectId(shippingId)) return res.status(400).send({err: "invalid shipping id"})
         const shipping = await Shipping.findByIdAndUpdate(shippingId, {$set: {name, phone, basicAddress, detailAddress, request, tag}},{new: true});
+        const user = await User.findById(shipping.userId);
+        if (user.token !== token) return res.status(400).send({err: "invalid token"})
         await User.updateOne(
             { 'shippings._id': shippingId }, 
             { "shippings.$.name":name, "shippings.$.phone":phone, "shippings.$.basicAddress": basicAddress, 
@@ -180,6 +189,15 @@ shippingRouter.patch('/:shippingId', async(req,res) => {
 *       responses:
 *           200: 
 *               description: Returns the deleted shipping
+*       requestBody:
+*           required: true
+*           content:
+*               application/json:
+*                   schema:
+*                       type: object
+*                       properties:
+*                           token:
+*                               type: string
 *       tags:
 *           - Shipping
 */
@@ -187,8 +205,12 @@ shippingRouter.delete('/:shippingId', async(req,res) => {
     try {
         const { shippingId } = req.params;
         if (!isValidObjectId(shippingId)) return res.status(400).send({err: "invalid shipping id"})
+        const { token } = req.body;
+        if (!token) return res.status(400).send({err: "token is required"})
         const shipping = await Shipping.findByIdAndRemove(shippingId);
         if (!shipping) return res.status(400).send({err: "Invalid shipping id"})
+        const user = await User.findById(shipping.userId);
+        if (user.token !== token) res.status(400).send({err: "invalid token"})
         await User.updateOne(
             { "shippings._id":shippingId},
             { $pull: { shippings: {_id: shippingId}}});
