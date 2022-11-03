@@ -76,7 +76,9 @@ shippingRouter.get('/:userId',async(req,res) => {
 *                               type: string
 *                           phone:
 *                               type: string
-*                           address:
+*                           basicAddress:
+*                               type: string
+*                           detailAddress:
 *                               type: string
 *                           request:
 *                               type: string
@@ -91,10 +93,11 @@ shippingRouter.get('/:userId',async(req,res) => {
 shippingRouter.post('/:userId', async(req,res) => {
     try {
         const { userId } = req.params;
-        let {name, phone, address, request, tag} = req.body;
+        let {name, phone, basicAddress, detailAddress, request, tag} = req.body;
         if (!name) return res.status(400).send({err: "name is required"})
         if (!phone) return res.status(400).send({err: "phone is required"})
-        if (!address) return res.status(400).send({err: "address is required"})
+        if (!basicAddress) return res.status(400).send({err: "basicAddress is required"})
+        if (!detailAddress) return res.status(400).send({err: "detailAddress is required"})
         if (!userId) return res.status(400).send({err: "userId is required"})
         let user = await User.findById(userId)
         if (!user) return res.status(400).send({err: "invalid user"})
@@ -132,7 +135,9 @@ shippingRouter.post('/:userId', async(req,res) => {
 *                               type: string
 *                           phone:
 *                               type: string
-*                           address:
+*                           basicAddress:
+*                               type: string
+*                           detailAddress:
 *                               type: string
 *                           request:
 *                               type: string
@@ -147,12 +152,13 @@ shippingRouter.post('/:userId', async(req,res) => {
 shippingRouter.patch('/:shippingId', async(req,res) => {
     try {
         const { shippingId } = req.params;
-        const { name, phone, address, request, tag } = req.body;
+        const { name, phone, basicAddress, detailAddress, request, tag } = req.body;
         if (!isValidObjectId(shippingId)) return res.status(400).send({err: "invalid shipping id"})
-        const shipping = await Shipping.findByIdAndUpdate(shippingId, {$set: {name, phone, address, request, tag}},{new: true});
+        const shipping = await Shipping.findByIdAndUpdate(shippingId, {$set: {name, phone, basicAddress, detailAddress, request, tag}},{new: true});
         await User.updateOne(
             { 'shippings._id': shippingId }, 
-            { "shippings.$.name":name, "shippings.$.phone":phone, "shippings.$.address": address, "shippings.$.request": request, "shippings.$.tag": tag})
+            { "shippings.$.name":name, "shippings.$.phone":phone, "shippings.$.basicAddress": basicAddress, 
+              "shippings.$.detailAddress": detailAddress, "shippings.$.request": request, "shippings.$.tag": tag})
         return res.send({ shipping })
     } catch(err) {
         console.log(err);
