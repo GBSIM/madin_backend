@@ -95,7 +95,6 @@ shippingRouter.post('/:userId', async(req,res) => {
         if (!name) return res.status(400).send({err: "name is required"})
         if (!phone) return res.status(400).send({err: "phone is required"})
         if (!address) return res.status(400).send({err: "address is required"})
-        if (!tag) return res.status(400).send({err: "tag is required"})
         if (!userId) return res.status(400).send({err: "userId is required"})
         let user = await User.findById(userId)
         if (!user) return res.status(400).send({err: "invalid user"})
