@@ -98,9 +98,6 @@ menuRouter.post('/', async(req,res) => {
         if (!tag) return res.status(400).send({err: "tag is required"})
         if (!menuClassId) return res.status(400).send({err: "menu class id is required"})
         if (!stock) return res.status(400).send({err: "stock is required"})
-        if (!pickupEn) return res.status(400).send({err: "pickupEn is required"})
-        if (!deliveryEn) return res.status(400).send({err: "deliveryEn is required"})
-        if (!presentEn) return res.status(400).send({err: "presentEn is required"})
         let menuClass = await MenuClass.findById(menuClassId);
         if (!menuClass) return res.status(400).send({err: "Invalid menu class"})
         const menu = new Menu({ ...req.body,menuClass });

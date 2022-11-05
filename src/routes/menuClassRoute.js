@@ -84,12 +84,9 @@ menuClassRouter.get('/:menuClassId',async(req,res) => {
 */
 menuClassRouter.post('/', async(req,res) => {
     try {
-        let {name, intro, pickunEn, deliveryEn, presentEn} = req.body;
+        let {name, intro, pickupEn, deliveryEn, presentEn} = req.body;
         if (!name) return res.status(400).send({err: "name is required"})
         if (!intro) return res.status(400).send({err: "intro is required"})
-        if (!pickunEn) return res.status(400).send({err: "pickunEn is required"})
-        if (!deliveryEn) return res.status(400).send({err: "deliveryEn is required"})
-        if (!presentEn) return res.status(400).send({err: "presentEn is required"})
         const menuClass = new MenuClass(req.body);
         await menuClass.save();
         return res.send({menuClass})

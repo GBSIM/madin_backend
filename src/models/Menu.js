@@ -9,9 +9,9 @@ const MenuSchema = new Schema({
         name: {type: String, required: true},
     },
     stock: {type: Number, required: true, default: 0},
-    pickupEn: {type: Boolean, required: true, default: false},
-    deliveryEn: {type: Boolean, required: true, default: false},
-    presentEn: {type: Boolean, required: true, default: false},
+    pickupEn: {type: Boolean, default: false},
+    deliveryEn: {type: Boolean, default: false},
+    presentEn: {type: Boolean, default: false},
     quantity: Number,
     imageUrl: String
 }, {timestamps: true})

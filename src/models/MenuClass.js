@@ -5,9 +5,9 @@ const MenuClassSchema = new Schema({
     name: {type: String, required: true},
     intro: {type: String, required: true},
     menus: [MenuSchema],
-    pickupEn: {type: Boolean, required: true},
-    deliveryEn: {type: Boolean, required: true},
-    presentEn: {type: Boolean, required: true},
+    pickupEn: {type: Boolean, default: false},
+    deliveryEn: {type: Boolean, default: false},
+    presentEn: {type: Boolean, default: false},
 }, {timestamps: true})
 
 const MenuClass = model('menuClass',MenuClassSchema);
