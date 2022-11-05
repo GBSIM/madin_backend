@@ -70,6 +70,12 @@ menuClassRouter.get('/:menuClassId',async(req,res) => {
 *                               type: string
 *                           intro:
 *                               type: string
+*                           pickupEn:
+*                               type: boolean
+*                           deliveryEn:
+*                               type: boolean
+*                           presentEn:
+*                               type: boolean
 *       responses:
 *           200: 
 *               description: Returns the added menu class
@@ -78,9 +84,12 @@ menuClassRouter.get('/:menuClassId',async(req,res) => {
 */
 menuClassRouter.post('/', async(req,res) => {
     try {
-        let {name, intro} = req.body;
+        let {name, intro, pickunEn, deliveryEn, presentEn} = req.body;
         if (!name) return res.status(400).send({err: "name is required"})
         if (!intro) return res.status(400).send({err: "intro is required"})
+        if (!pickunEn) return res.status(400).send({err: "pickunEn is required"})
+        if (!deliveryEn) return res.status(400).send({err: "deliveryEn is required"})
+        if (!presentEn) return res.status(400).send({err: "presentEn is required"})
         const menuClass = new MenuClass(req.body);
         await menuClass.save();
         return res.send({menuClass})
@@ -143,6 +152,12 @@ menuClassRouter.delete('/:menuClassId', async(req,res) => {
 *                               type: string
 *                           intro:
 *                               type: string
+*                           pickupEn:
+*                               type: string
+*                           deliveryEn:
+*                               type: string
+*                           presentEn:
+*                               type: string
 *       responses:
 *           200: 
 *               description: Returns the updated menu class
@@ -153,8 +168,8 @@ menuClassRouter.patch('/:menuClassId', async(req,res) => {
     try {
         const { menuClassId } = req.params;
         if (!isValidObjectId(menuClassId)) return res.status(400).send({err: "invalid menu class id"})
-        const { name, intro } = req.body;
-        const menuClass = await MenuClass.findByIdAndUpdate(menuClassId, {$set: {name,intro}},{new: true});
+        const { name, intro, pickupEn, deliveryEn, presentEn } = req.body;
+        const menuClass = await MenuClass.findByIdAndUpdate(menuClassId, {$set: {name,intro,pickupEn,deliveryEn,presentEn}},{new: true});
         return res.send({menuClass})
     } catch(err) {
         console.log(err);

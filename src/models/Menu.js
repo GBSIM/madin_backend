@@ -11,6 +11,7 @@ const MenuSchema = new Schema({
     stock: {type: Number, required: true, default: 0},
     pickupEn: {type: Boolean, required: true, default: false},
     deliveryEn: {type: Boolean, required: true, default: false},
+    presentEn: {type: Boolean, required: true, default: false},
     quantity: Number,
     imageUrl: String
 }, {timestamps: true})
