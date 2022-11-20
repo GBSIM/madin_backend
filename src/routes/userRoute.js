@@ -181,6 +181,7 @@ userRouter.post('/kakaologin', async(req,res) => {
         user.tokenExpiration = currentTime.setHours(currentTime.getHours() + 2);
         await user.save();
         user.socialToken = "";
+        user.socialId = "";
         return res.send({user})
     } catch(err) {
         console.log(err);
