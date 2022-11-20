@@ -29,15 +29,9 @@ userRouter.get('/',async(req,res) => {
 
 /**
 * @openapi
-* /user/auth/{socialId}:
+* /user/auth:
 *   post:
 *       description: Get user by social id
-*       parameters:
-*           - name: socialId
-*             in: path     
-*             description: social id of user
-*             schema:
-*               type: string
 *       requestBody:
 *           required: true
 *           content:
@@ -53,15 +47,14 @@ userRouter.get('/',async(req,res) => {
 *       tags:
 *           - User
 */
-userRouter.post('/auth/:socialId', async(req,res) => {
+userRouter.post('/auth', async(req,res) => {
     try {
-        const { socialId } = req.params;
         const { token } = req.body;
-        const user = await User.findOne({socialId: socialId});
+        const user = await User.findOne({token: token});
         if (!user) return res.status(400).send({err: "no matched user"})
-        if ( user.token !== token) return res.status(400).send({err: "token is wrong"})
         const currentTime = new Date();
         if ((user.token === token) && (currentTime > user.tokenExpiration)) return res.status(400).send({err: "token is expired"})
+        user.socialId = "";
         user.socialToken = "";
         return res.send({user})
     } catch(err) {
