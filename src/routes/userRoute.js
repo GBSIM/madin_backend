@@ -274,7 +274,7 @@ userRouter.post('/cart', async(req,res) => {
 
         let isMenuInCart = false;
         const cart = user.cart;
-        cart.map(async(cartMenu) => {
+        cart.map(async(cartMenu, index) => {
             if (cartMenu._id.toString() === menuId) {
                 if (quantity > 0) {
                     cartMenu.quantity = cartMenu.quantity + quantity;
@@ -282,6 +282,9 @@ userRouter.post('/cart', async(req,res) => {
                     if (cartMenu.quantity > 0) {
                         cartMenu.quantity = cartMenu.quantity + quantity;
                     }
+                }
+                if (cartMenu.quantity === 0) {
+                    cart.splice(index,1);
                 }
                 isMenuInCart = true;
                 await user.save().then(() => {
@@ -293,16 +296,15 @@ userRouter.post('/cart', async(req,res) => {
         })
 
         if (!isMenuInCart) {
-            user.cart.push(menu);
-            await user.save().then(() => {
-                user.socialToken = "";
-                user.socialId = "";
-                user.token = "";
-            });
+            if (menu.quantity > 0) {
+                user.cart.push(menu);
+                await user.save().then(() => {
+                    user.socialToken = "";
+                    user.socialId = "";
+                    user.token = "";
+                });
+            }
         }
-
-        console.log(user);
-
         return res.send({user})
     } catch(err) {
         console.log(err);
