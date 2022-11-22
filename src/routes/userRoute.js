@@ -94,8 +94,11 @@ userRouter.post('/', async(req,res) => {
         if (!email) return res.status(400).send({err: "email is required"})
         if (!socialId) return res.status(400).send({err: "socialId is required"})
         const user = new User(req.body);
-        await user.save();
-        user.socialToken = "";
+        await user.save().then(() => {
+            user.socialToken = "";
+            user.token = "";
+            user.socialId = "";
+        });
         return res.send({user})
     } catch(err) {
         console.log(err);
@@ -172,9 +175,10 @@ userRouter.post('/kakaologin', async(req,res) => {
         var token = await jwt.sign(user._id.toHexString() + currentTime.toString(), 'secretToken');
         user.token = token;
         user.tokenExpiration = currentTime.setHours(currentTime.getHours() + 2);
-        await user.save();
-        user.socialToken = "";
-        user.socialId = "";
+        await user.save().then(() => {
+            user.socialToken = "";
+            user.socialId = "";
+        });
         return res.send({user})
     } catch(err) {
         console.log(err);
