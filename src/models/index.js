@@ -4,5 +4,4 @@ module.exports = {
     ...require('./Shipping'),
     ...require('./MenuClass'),
     ...require('./Menu'),
-    ...require('./Cart')
 }
