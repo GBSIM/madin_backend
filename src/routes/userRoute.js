@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const {User, Shipping} = require('../models');
+const {User, Shipping, Menu} = require('../models');
 const { isValidObjectId } = require('mongoose');
 const { get, post } = require('axios');
 const jwt = require('jsonwebtoken');
@@ -157,11 +157,12 @@ userRouter.post('/kakaologin', async(req,res) => {
         let socialId = 'kakao_'+responseUserInfo.data.id;
         let name = responseUserInfo.data.properties.nickname;
         let email = responseUserInfo.data.kakao_account.email;
+        let cart = [];
 
         let user
         user = await User.findOne({socialId: socialId});
         if (!user) {
-            user = new User({socialId, name, email, socialToken});
+            user = new User({socialId, name, email, socialToken, cart});
             await user.save();
         } else {
             user.socialToken = socialToken;
@@ -211,7 +212,7 @@ userRouter.post('/logout', async(req,res) => {
         if (!user) return res.status(400).send({err: "no matched user"})
         if (!user.socialToken) return res.status(400).send({err: "accessToken does not exist in user db"})
 
-        const responseLogout = await post('https://kapi.kakao.com/v1/user/logout',{},{
+        await post('https://kapi.kakao.com/v1/user/logout',{},{
             headers: {
                 Authorization: `Bearer ${user.socialToken}`,
             },
@@ -220,6 +221,70 @@ userRouter.post('/logout', async(req,res) => {
         user.socialToken = "";
         user.token = "";
         user.tokenExpiration = "";
+        await user.save();
+
+        return res.send({user})
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({err: err.message})
+    }
+});
+
+/**
+* @openapi
+* /user/cart:
+*   post:
+*       description: add menu to user's cart
+*       requestBody:
+*           required: true
+*           content:
+*               application/json:
+*                   schema:
+*                       type: object
+*                       properties:
+*                           token:
+*                               type: string
+*                           menuId:
+*                               type: string
+*                           quantity:
+*                               type: string
+*       responses:
+*           200: 
+*               description: Returns the user
+*       tags:
+*           - User
+*/
+userRouter.post('/cart', async(req,res) => {
+    try {
+        let { token, menuId, quantity } = req.body;
+        if (!token) return res.status(400).send({err: "token is required"})
+        if (!menuId) return res.status(400).send({err: "menuId is required"})
+        if (!quantity) return res.status(400).send({err: "quantity is required"})
+        
+        const user = await User.findOne({token: token});
+        if (!user) return res.status(400).send({err: "no matched user"})
+        
+        const menu = await Menu.findById(menuId);
+        if (!menu) return res.status(400).send({err: "no matched menu"})
+
+        menu.quantity = quantity;
+
+        let isMenuInCart = false;
+        user.cart.map((cartMenu,index) => {
+            if (cartMenu._id === menuId) {
+                cartMenu.quantity = cartMenu.quantity + quantity;
+                isMenuInCart = true;
+            }
+        })
+
+        if (!isMenuInCart) {
+            user.cart.push(menu);
+        }
+
+        user.socialToken = "";
+        user.token = "";
+        user.tokenExpiration = "";
+
         await user.save();
 
         return res.send({user})
