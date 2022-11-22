@@ -1,6 +1,7 @@
 const {Schema, model} = require('mongoose');
 const { OrderSchema } = require('./Order');
 const { ShippingSchema } = require('./Shipping');
+const { MenuSchema } = require('./Menu');
 
 const UserSchema = new Schema({
     name: { type: String, required: true},
@@ -14,6 +15,7 @@ const UserSchema = new Schema({
     token: String,
     socialToken: String,
     tokenExpiration: Date,
+    cart: [MenuSchema],
 }, {timestamps: true})
 
 const User = model('user',UserSchema);
