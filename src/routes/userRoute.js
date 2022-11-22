@@ -246,7 +246,7 @@ userRouter.post('/logout', async(req,res) => {
 *                           menuId:
 *                               type: string
 *                           quantity:
-*                               type: string
+*                               type: number
 *       responses:
 *           200: 
 *               description: Returns the user
@@ -269,22 +269,35 @@ userRouter.post('/cart', async(req,res) => {
         menu.quantity = quantity;
 
         let isMenuInCart = false;
-        user.cart.map((cartMenu,index) => {
-            if (cartMenu._id === menuId) {
-                cartMenu.quantity = cartMenu.quantity + quantity;
+        const cart = user.cart;
+        cart.map(async(cartMenu) => {
+            if (cartMenu._id.toString() === menuId) {
+                if (quantity > 0) {
+                    cartMenu.quantity = cartMenu.quantity + quantity;
+                } else {
+                    if (cartMenu.quantity > 0) {
+                        cartMenu.quantity = cartMenu.quantity + quantity;
+                    }
+                }
                 isMenuInCart = true;
+                await user.save().then(() => {
+                    user.socialToken = "";
+                    user.socialId = "";
+                    user.token = "";
+                });
             }
         })
 
         if (!isMenuInCart) {
             user.cart.push(menu);
+            await user.save().then(() => {
+                user.socialToken = "";
+                user.socialId = "";
+                user.token = "";
+            });
         }
 
-        user.socialToken = "";
-        user.token = "";
-        user.tokenExpiration = "";
-
-        await user.save();
+        console.log(user);
 
         return res.send({user})
     } catch(err) {
