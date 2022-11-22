@@ -157,12 +157,11 @@ userRouter.post('/kakaologin', async(req,res) => {
         let socialId = 'kakao_'+responseUserInfo.data.id;
         let name = responseUserInfo.data.properties.nickname;
         let email = responseUserInfo.data.kakao_account.email;
-        let cart = [];
 
         let user
         user = await User.findOne({socialId: socialId});
         if (!user) {
-            user = new User({socialId, name, email, socialToken, cart});
+            user = new User({socialId, name, email, socialToken});
             await user.save();
         } else {
             user.socialToken = socialToken;
