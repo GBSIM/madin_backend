@@ -350,6 +350,7 @@ userRouter.patch('/cart', async(req,res) => {
         const user = await User.findOne({token: token});
         if (!user) return res.status(400).send({err: "no matched user"})
 
+        const cart = user.cart;
         if (isAllMenus) {
             cart.map(async(cartMenu) => {
                 cartMenu.isChecked = isChecked;
