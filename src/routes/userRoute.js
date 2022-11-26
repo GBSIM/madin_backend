@@ -343,7 +343,9 @@ userRouter.patch('/cart', async(req,res) => {
     try {
         let { token, menuId, isChecked, isAllMenus } = req.body;
         if (!token) return res.status(400).send({err: "token is required"})
-        if (!menuId) return res.status(400).send({err: "menuId is required"})
+        if (!isAllMenus) {
+            if (!menuId) return res.status(400).send({err: "menuId is required"})
+        }
         
         const user = await User.findOne({token: token});
         if (!user) return res.status(400).send({err: "no matched user"})
