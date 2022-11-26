@@ -314,6 +314,58 @@ userRouter.post('/cart', async(req,res) => {
 
 /**
 * @openapi
+* /user/cart:
+*   delete:
+*       description: delete menu from user's cart
+*       requestBody:
+*           required: true
+*           content:
+*               application/json:
+*                   schema:
+*                       type: object
+*                       properties:
+*                           token:
+*                               type: string
+*                           menuId:
+*                               type: string
+*       responses:
+*           200: 
+*               description: Returns the user
+*       tags:
+*           - User
+*/
+userRouter.delete('/cart', async(req,res) => {
+    try {
+        let { token, menuId } = req.body;
+        if (!token) return res.status(400).send({err: "token is required"})
+        if (!menuId) return res.status(400).send({err: "menuId is required"})
+        
+        const user = await User.findOne({token: token});
+        if (!user) return res.status(400).send({err: "no matched user"})
+        
+        const menu = await Menu.findById(menuId);
+        if (!menu) return res.status(400).send({err: "no matched menu"})
+
+        const cart = user.cart;
+        cart.map(async(cartMenu, index) => {
+            if (cartMenu._id.toString() === menuId) {
+                cart.splice(index,1);
+                await user.save().then(() => {
+                    user.socialToken = "";
+                    user.socialId = "";
+                    user.token = "";
+                });
+            }
+        })
+        return res.send({user})
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({err: err.message})
+    }
+});
+
+/**
+* @openapi
 * /user/{userId}:
 *   delete:
 *       description: delete user's information
