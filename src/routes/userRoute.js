@@ -354,12 +354,12 @@ userRouter.patch('/cart', async(req,res) => {
         if (isAllMenus) {
             cart.map(async(cartMenu) => {
                 cartMenu.isChecked = isChecked;
-                await user.save().then(() => {
-                    user.socialToken = "";
-                    user.socialId = "";
-                    user.token = "";
-                });
             })
+            await user.save().then(() => {
+                user.socialToken = "";
+                user.socialId = "";
+                user.token = "";
+            });
         } else {
             cart.map(async(cartMenu) => {
                 if (cartMenu._id.toString() === menuId) {
