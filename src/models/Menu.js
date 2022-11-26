@@ -13,6 +13,7 @@ const MenuSchema = new Schema({
     deliveryEn: {type: Boolean, default: false},
     presentEn: {type: Boolean, default: false},
     quantity: Number,
+    isChecked: {type: Boolean, default: true},
     imageUrl: String
 }, {timestamps: true})
 

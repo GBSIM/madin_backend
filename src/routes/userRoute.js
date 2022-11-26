@@ -271,6 +271,7 @@ userRouter.post('/cart', async(req,res) => {
         if (!menu) return res.status(400).send({err: "no matched menu"})
 
         menu.quantity = quantity;
+        menu.isChecked = true;
 
         let isMenuInCart = false;
         const cart = user.cart;
@@ -305,6 +306,57 @@ userRouter.post('/cart', async(req,res) => {
                 });
             }
         }
+        return res.send({user})
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({err: err.message})
+    }
+});
+
+/**
+* @openapi
+* /user/cart:
+*   patch:
+*       description: update menu to user's cart
+*       requestBody:
+*           required: true
+*           content:
+*               application/json:
+*                   schema:
+*                       type: object
+*                       properties:
+*                           token:
+*                               type: string
+*                           menuId:
+*                               type: string
+*                           isChecked:
+*                               type: boolean
+*       responses:
+*           200: 
+*               description: Returns the user
+*       tags:
+*           - User
+*/
+userRouter.patch('/cart', async(req,res) => {
+    try {
+        let { token, menuId, isChecked } = req.body;
+        if (!token) return res.status(400).send({err: "token is required"})
+        if (!menuId) return res.status(400).send({err: "menuId is required"})
+        
+        const user = await User.findOne({token: token});
+        if (!user) return res.status(400).send({err: "no matched user"})
+
+        const cart = user.cart;
+        cart.map(async(cartMenu, index) => {
+            if (cartMenu._id.toString() === menuId) {
+                cartMenu.isChecked = isChecked;
+                await user.save().then(() => {
+                    user.socialToken = "";
+                    user.socialId = "";
+                    user.token = "";
+                });
+            }
+        })
         return res.send({user})
     } catch(err) {
         console.log(err);
