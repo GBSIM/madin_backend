@@ -331,6 +331,8 @@ userRouter.post('/cart', async(req,res) => {
 *                               type: string
 *                           isChecked:
 *                               type: boolean
+*                           isAllMenus:
+*                               type: boolean
 *       responses:
 *           200: 
 *               description: Returns the user
@@ -339,24 +341,34 @@ userRouter.post('/cart', async(req,res) => {
 */
 userRouter.patch('/cart', async(req,res) => {
     try {
-        let { token, menuId, isChecked } = req.body;
+        let { token, menuId, isChecked, isAllMenus } = req.body;
         if (!token) return res.status(400).send({err: "token is required"})
         if (!menuId) return res.status(400).send({err: "menuId is required"})
         
         const user = await User.findOne({token: token});
         if (!user) return res.status(400).send({err: "no matched user"})
 
-        const cart = user.cart;
-        cart.map(async(cartMenu, index) => {
-            if (cartMenu._id.toString() === menuId) {
+        if (isAllMenus) {
+            cart.map(async(cartMenu) => {
                 cartMenu.isChecked = isChecked;
                 await user.save().then(() => {
                     user.socialToken = "";
                     user.socialId = "";
                     user.token = "";
                 });
-            }
-        })
+            })
+        } else {
+            cart.map(async(cartMenu) => {
+                if (cartMenu._id.toString() === menuId) {
+                    cartMenu.isChecked = isChecked;
+                    await user.save().then(() => {
+                        user.socialToken = "";
+                        user.socialId = "";
+                        user.token = "";
+                    });
+                }
+            })
+        }
         return res.send({user})
     } catch(err) {
         console.log(err);
