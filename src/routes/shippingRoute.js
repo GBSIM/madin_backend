@@ -56,15 +56,9 @@ shippingRouter.get('/:userId',async(req,res) => {
 
 /**
 * @openapi
-* /shipping/{userId}:
+* /shipping:
 *   post:
 *       description: register shipping information
-*       parameters:
-*           - name: userId
-*             in: path     
-*             description: id of the user
-*             schema:
-*               type: string
 *       requestBody:
 *           required: true
 *           content:
@@ -92,23 +86,22 @@ shippingRouter.get('/:userId',async(req,res) => {
 *       tags:
 *           - Shipping
 */
-shippingRouter.post('/:userId', async(req,res) => {
+shippingRouter.post('/', async(req,res) => {
     try {
-        const { userId } = req.params;
         let {name, phone, basicAddress, detailAddress, request, tag, token} = req.body;
         if (!name) return res.status(400).send({err: "name is required"})
         if (!phone) return res.status(400).send({err: "phone is required"})
         if (!basicAddress) return res.status(400).send({err: "basicAddress is required"})
         if (!detailAddress) return res.status(400).send({err: "detailAddress is required"})
-        if (!userId) return res.status(400).send({err: "userId is required"})
         if (!token) return res.status(400).send({err: "token is required"})
-        let user = await User.findById(userId)
+        let user = await User.findOne({token: token});
+        userId = user._id;
         if (!user) return res.status(400).send({err: "invalid user"})
         if (user.token !== token) return res.status(400).send({err: "token is invalid"})
         const shipping = new Shipping({ ...req.body,userId});
         await Promise.all([
             shipping.save(),
-            User.updateOne({ _id: userId }, { $push: {shippings: shipping}})
+            User.updateOne({ _id: user._id }, { $push: {shippings: shipping}})
         ]);        
         return res.send({shipping})
     } catch(err) {
