@@ -479,15 +479,9 @@ userRouter.delete('/:userId', async(req,res) => {
 
 /**
 * @openapi
-* /user/{userId}:
+* /user:
 *   patch:
 *       description: Update the user's information
-*       parameters:
-*           - name: userId
-*             in: path     
-*             description: id of user
-*             schema:
-*               type: string
 *       requestBody:
 *           required: true
 *           content:
@@ -511,18 +505,16 @@ userRouter.delete('/:userId', async(req,res) => {
 *       tags:
 *           - User
 */
-userRouter.patch('/:userId', async(req,res) => {
+userRouter.patch('/', async(req,res) => {
     try {
-        const { userId } = req.params;
         if (!isValidObjectId(userId)) return res.status(400).send({err: "invalid user id"})
         const { profileImageUrl, email, phone, name, token } = req.body;
         let user;
-        user = await User.findById(userId);
+        user = await User.findOne({token: token});
         if (!user) return res.status(400).send({err: "no matched user"})
-        if ( user.token !== token) return res.status(400).send({err: "token is wrong"})
         const currentTime = new Date();
         if ((user.token === token) && (currentTime > user.tokenExpiration)) return res.status(400).send({err: "token is expired"})
-        user = await User.findOneAndUpdate({_id: userId}, {$set: {profileImageUrl,email,phone,name}},{new: true});
+        user = await User.findOneAndUpdate({token: token}, {$set: {profileImageUrl,email,phone,name}},{new: true});
         user.socialToken = "";
         return res.send({user})
     } catch(err) {
