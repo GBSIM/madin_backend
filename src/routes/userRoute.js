@@ -507,7 +507,6 @@ userRouter.delete('/:userId', async(req,res) => {
 */
 userRouter.patch('/', async(req,res) => {
     try {
-        if (!isValidObjectId(userId)) return res.status(400).send({err: "invalid user id"})
         const { profileImageUrl, email, phone, name, token } = req.body;
         let user;
         user = await User.findOne({token: token});
