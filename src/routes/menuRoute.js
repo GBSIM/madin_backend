@@ -42,11 +42,12 @@ menuRouter.get('/',async(req,res) => {
 *       tags:
 *           - Menu
 */
-menuRouter.get('/:menuId',async(req,res) => {
+menuRouter.get('/:_id',async(req,res) => {
     try {
-        const { menuId } = req.params;
-        if (!isValidObjectId(menuId)) return res.status(400).send({err: "invalid menu id"})
-        const menu = await Menu.findById({menuId});
+        const { _id } = req.params;
+        console.log(_id);
+        if (!isValidObjectId(_id)) return res.status(400).send({err: "invalid menu id"})
+        const menu = await Menu.findById({_id});
         return res.send({menu})
     } catch(err) {
         console.log(err);

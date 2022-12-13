@@ -42,11 +42,11 @@ menuClassRouter.get('/',async(req,res) => {
 *       tags:
 *           - MenuClass
 */
-menuClassRouter.get('/:menuClassId',async(req,res) => {
+menuClassRouter.get('/:_id',async(req,res) => {
     try {
-        const { menuClassId } = req.params;
-        if (!isValidObjectId(menuClassId)) return res.status(400).send({err: "invalid menu class id"})
-        const menuClass = await Menu.findById({menuClassId});
+        const { _id } = req.params;
+        if (!isValidObjectId(_id)) return res.status(400).send({err: "invalid menu class id"})
+        const menuClass = await Menu.findById({_id});
         return res.send({menuClass})
     } catch(err) {
         console.log(err);

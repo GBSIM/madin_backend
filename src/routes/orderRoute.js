@@ -42,11 +42,11 @@ orderRouter.get('/',async(req,res) => {
 *       tags:
 *           - Order
 */
-orderRouter.get('/:orderId',async(req,res) => {
+orderRouter.get('/:_id',async(req,res) => {
     try {
-        const { orderId } = req.params;
-        if (!isValidObjectId(orderId)) return res.status(400).send({err: "invalid order id"})
-        const order = await Order.findById(orderId);
+        const { _id } = req.params;
+        if (!isValidObjectId(_id)) return res.status(400).send({err: "invalid order id"})
+        const order = await Order.findById(_id);
         return res.send({order})
     } catch(err) {
         console.log(err);
