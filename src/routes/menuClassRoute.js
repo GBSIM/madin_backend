@@ -70,12 +70,8 @@ menuClassRouter.get('/:_id',async(req,res) => {
 *                               type: string
 *                           intro:
 *                               type: string
-*                           pickupEn:
-*                               type: boolean
-*                           deliveryEn:
-*                               type: boolean
-*                           presentEn:
-*                               type: boolean
+*                           orderType:
+*                               type: string
 *       responses:
 *           200: 
 *               description: Returns the added menu class
@@ -84,7 +80,7 @@ menuClassRouter.get('/:_id',async(req,res) => {
 */
 menuClassRouter.post('/', async(req,res) => {
     try {
-        let {name, intro, pickupEn, deliveryEn, presentEn} = req.body;
+        let {name, intro, orderType} = req.body;
         if (!name) return res.status(400).send({err: "name is required"})
         if (!intro) return res.status(400).send({err: "intro is required"})
         const menuClass = new MenuClass(req.body);
@@ -149,11 +145,7 @@ menuClassRouter.delete('/:menuClassId', async(req,res) => {
 *                               type: string
 *                           intro:
 *                               type: string
-*                           pickupEn:
-*                               type: string
-*                           deliveryEn:
-*                               type: string
-*                           presentEn:
+*                           orderType:
 *                               type: string
 *       responses:
 *           200: 
@@ -165,8 +157,8 @@ menuClassRouter.patch('/:menuClassId', async(req,res) => {
     try {
         const { menuClassId } = req.params;
         if (!isValidObjectId(menuClassId)) return res.status(400).send({err: "invalid menu class id"})
-        const { name, intro, pickupEn, deliveryEn, presentEn } = req.body;
-        const menuClass = await MenuClass.findByIdAndUpdate(menuClassId, {$set: {name,intro,pickupEn,deliveryEn,presentEn}},{new: true});
+        const { name, intro, orderType } = req.body;
+        const menuClass = await MenuClass.findByIdAndUpdate(menuClassId, {$set: {name,intro,orderType}},{new: true});
         return res.send({menuClass})
     } catch(err) {
         console.log(err);

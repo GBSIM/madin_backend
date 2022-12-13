@@ -77,13 +77,11 @@ menuRouter.get('/:_id',async(req,res) => {
 *                               type: string
 *                           stock:
 *                               type: number
-*                           pickupEn:
-*                               type: boolean
-*                           deliveryEn:
-*                               type: boolean
-*                           presentEn:
-*                               type: boolean
+*                           orderType:
+*                               type: string
 *                           imageUrl:
+*                               type: string
+*                           intro:
 *                               type: string
 *       responses:
 *           200: 
@@ -93,7 +91,7 @@ menuRouter.get('/:_id',async(req,res) => {
 */
 menuRouter.post('/', async(req,res) => {
     try {
-        let {name, price, tag, menuClassId, stock, pickupEn, deliveryEn, presentEn, imageUrl} = req.body;
+        let {name, price, tag, menuClassId, stock, orderType, imageUrl, intro} = req.body;
         if (!name) return res.status(400).send({err: "name is required"})
         if (!price) return res.status(400).send({err: "price is required"})
         if (!tag) return res.status(400).send({err: "tag is required"})
@@ -173,13 +171,11 @@ menuRouter.delete('/:menuId', async(req,res) => {
 *                               type: string
 *                           stock:
 *                               type: number
-*                           pickupEn:
-*                               type: boolean
-*                           deliveryEn:
-*                               type: boolean
-*                           presentEn:
-*                               type: boolean
+*                           orderType:
+*                               type: string
 *                           imageUrl:
+*                               type: string
+*                           intro:
 *                               type: string
 *       responses:
 *           200: 
@@ -190,16 +186,15 @@ menuRouter.delete('/:menuId', async(req,res) => {
 menuRouter.patch('/:menuId', async(req,res) => {
     try {
         const { menuId } = req.params;
-        const { name, price, tag, pickupEn, deliveryEn, presentEn, stock, imageUrl } = req.body;
+        const { name, price, tag, orderType, stock, imageUrl, intro } = req.body;
         if (!isValidObjectId(menuId)) return res.status(400).send({err: "invalid menu id"})
-        const menu = await Menu.findByIdAndUpdate(menuId, {$set: {name, price, tag, pickupEn, deliveryEn, imageUrl}},{new: true});
+        const menu = await Menu.findByIdAndUpdate(menuId, {$set: {name, price, tag, orderType, imageUrl, intro}},{new: true});
         await MenuClass.updateOne(
             { 'menus._id': menuId }, 
             { "menus.$.name":name, "menus.$.price":price, 
-              "menus.$.tag": tag, "menus.$.pickupEn": pickupEn, 
-              "menus.$.deliveryEn": deliveryEn,
-              "menus.$.presentEn": presentEn,
+              "menus.$.tag": tag, "menus.$.orderType": orderType,
               "menus.$.stock": stock,
+              "menus.$.intro": intro,
               "menus.$.imageUrl": imageUrl,})
         return res.send({menu})
     } catch(err) {

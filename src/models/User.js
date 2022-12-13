@@ -16,6 +16,7 @@ const UserSchema = new Schema({
     socialToken: String,
     tokenExpiration: Date,
     cart: [MenuSchema],
+    likes: [MenuSchema],
 }, {timestamps: true})
 
 const User = model('user',UserSchema);

@@ -9,12 +9,11 @@ const MenuSchema = new Schema({
         name: {type: String, required: true},
     },
     stock: {type: Number, required: true, default: 0},
-    pickupEn: {type: Boolean, default: false},
-    deliveryEn: {type: Boolean, default: false},
-    presentEn: {type: Boolean, default: false},
+    orderType: {type: String, default: 'delivery'},
     quantity: Number,
     isChecked: {type: Boolean, default: true},
-    imageUrl: String
+    imageUrl: String,
+    intro: String,
 }, {timestamps: true})
 
 const Menu = model('menu',MenuSchema);
