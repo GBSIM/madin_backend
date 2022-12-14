@@ -433,6 +433,117 @@ userRouter.delete('/cart', async(req,res) => {
 
 /**
 * @openapi
+* /user/like:
+*   post:
+*       description: add menu to user's likes
+*       requestBody:
+*           required: true
+*           content:
+*               application/json:
+*                   schema:
+*                       type: object
+*                       properties:
+*                           token:
+*                               type: string
+*                           menuId:
+*                               type: string
+*       responses:
+*           200: 
+*               description: Returns the user
+*       tags:
+*           - User
+*/
+userRouter.post('/like', async(req,res) => {
+    try {
+        let { token, menuId } = req.body;
+        if (!token) return res.status(400).send({err: "token is required"})
+        if (!menuId) return res.status(400).send({err: "menuId is required"})        
+        
+        const user = await User.findOne({token: token});
+        if (!user) return res.status(400).send({err: "no matched user"})
+        
+        const menu = await Menu.findById(menuId);
+        if (!menu) return res.status(400).send({err: "no matched menu"})
+
+        let isMenuInLikes = false;
+        const likes = user.likes;
+        likes.map(async(likeMenuId) => {
+            if (likeMenuId.toString() === menuId) {
+                isMenuInLikes = true;
+            }
+        })
+
+        if (!isMenuInLikes) {
+            user.likes.push(menuId);
+            await user.save().then(() => {
+                user.socialToken = "";
+                user.socialId = "";
+                user.token = "";
+            });
+        }
+        
+        return res.send({user})
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({err: err.message})
+    }
+});
+
+/**
+* @openapi
+* /user/like:
+*   delete:
+*       description: delete menu to user's likes
+*       requestBody:
+*           required: true
+*           content:
+*               application/json:
+*                   schema:
+*                       type: object
+*                       properties:
+*                           token:
+*                               type: string
+*                           menuId:
+*                               type: string
+*       responses:
+*           200: 
+*               description: Returns the user
+*       tags:
+*           - User
+*/
+userRouter.delete('/like', async(req,res) => {
+    try {
+        let { token, menuId } = req.body;
+        if (!token) return res.status(400).send({err: "token is required"})
+        if (!menuId) return res.status(400).send({err: "menuId is required"})        
+        
+        const user = await User.findOne({token: token});
+        if (!user) return res.status(400).send({err: "no matched user"})
+        
+        const menu = await Menu.findById(menuId);
+        if (!menu) return res.status(400).send({err: "no matched menu"})
+
+        const likes = user.likes;
+        likes.map(async(likeMenuId, index) => {
+            if (likeMenuId.toString() === menuId) {
+                likes.splice(index,1);
+                await user.save().then(() => {
+                    user.socialToken = "";
+                    user.socialId = "";
+                    user.token = "";
+                });
+            }
+        })
+        
+        return res.send({user})
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({err: err.message})
+    }
+});
+
+/**
+* @openapi
 * /user/{userId}:
 *   delete:
 *       description: delete user's information

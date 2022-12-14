@@ -1,4 +1,4 @@
-const {Schema, model} = require('mongoose');
+const {Schema, model, Types:{ ObjectId }} = require('mongoose');
 const { OrderSchema } = require('./Order');
 const { ShippingSchema } = require('./Shipping');
 const { MenuSchema } = require('./Menu');
@@ -16,7 +16,7 @@ const UserSchema = new Schema({
     socialToken: String,
     tokenExpiration: Date,
     cart: [MenuSchema],
-    likes: [MenuSchema],
+    likes: [ObjectId],
 }, {timestamps: true})
 
 const User = model('user',UserSchema);
