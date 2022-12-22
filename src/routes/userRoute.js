@@ -188,6 +188,92 @@ userRouter.post('/kakaologin', async(req,res) => {
 
 /**
 * @openapi
+* /user/naverlogin:
+*   post:
+*       description: login with naver social login service
+*       requestBody:
+*           required: true
+*           content:
+*               application/json:
+*                   schema:
+*                       type: object
+*                       properties:
+*                           state:
+*                               type: string
+*                           code:
+*                               type: string
+*                           redirectUri:
+*                               type: string
+*       responses:
+*           200: 
+*               description: Returns the logined user
+*       tags:
+*           - User
+*/
+userRouter.post('/naverlogin', async(req,res) => {
+    try {
+        let {state,code,redirectUri} = req.body;
+        if (!state) return res.status(400).send({err: "state is required"})
+        if (!code) return res.status(400).send({err: "code is required"})
+        if (!redirectUri) return res.status(400).send({err: "redirectUri is required"})
+        
+        const bodyData = {
+            grant_type : "authorization_code",
+            client_id : "WpWqvTCMbQqXK4On9905",
+            client_secret: "ZhJfL6vD0j",
+            redirect_uri : redirectUri,
+            code : code
+        }
+        const queryStringBody = Object.keys(bodyData)
+            .map(k=> encodeURIComponent(k)+"="+encodeURI(bodyData[k]))
+            .join("&")
+
+        const responseToken = await post('https://nid.naver.com/oauth2.0/token',
+            queryStringBody
+        );
+
+        const accessToken = responseToken.data.access_token;
+        const socialToken = accessToken; 
+
+        const responseUserInfo = await get('https://openapi.naver.com/v1/nid/me', {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
+
+        console.log(responseUserInfo);
+        let socialId = 'naver_'+responseUserInfo.data.response.id;
+        let name = responseUserInfo.data.response.name;
+        let email = responseUserInfo.data.response.email;
+        let phone = responseUserInfo.data.response.mobile;
+
+        let user
+        user = await User.findOne({socialId: socialId});
+        if (!user) {
+            user = new User({socialId, name, email, phone, socialToken});
+            await user.save();
+        } else {
+            user.socialToken = socialToken;
+            await user.save();
+        }
+        
+        const currentTime = new Date();
+        var token = await jwt.sign(user._id.toHexString() + currentTime.toString(), 'secretToken');
+        user.token = token;
+        user.tokenExpiration = currentTime.setHours(currentTime.getHours() + 2);
+        await user.save().then(() => {
+            user.socialToken = "";
+            user.socialId = "";
+        });
+        return res.send({user})
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({err: err.message})
+    }
+});
+
+/**
+* @openapi
 * /user/logout:
 *   post:
 *       description: logout with kakao social login service
@@ -200,6 +286,8 @@ userRouter.post('/kakaologin', async(req,res) => {
 *                       properties:
 *                           token:
 *                               type: string
+*                           socialLogin:
+*                               type: string
 *       responses:
 *           200: 
 *               description: Returns the logoutted user
@@ -208,18 +296,21 @@ userRouter.post('/kakaologin', async(req,res) => {
 */
 userRouter.post('/logout', async(req,res) => {
     try {
-        let { token } = req.body;
+        let { token, socialLogin } = req.body;
         if (!token) return res.status(400).send({err: "token is required"})
+        if (!socialLogin) return res.status(400).send({err: "socialLogin is required"})
         
         const user = await User.findOne({token: token});
         if (!user) return res.status(400).send({err: "no matched user"})
         if (!user.socialToken) return res.status(400).send({err: "accessToken does not exist in user db"})
 
-        await post('https://kapi.kakao.com/v1/user/logout',{},{
-            headers: {
-                Authorization: `Bearer ${user.socialToken}`,
-            },
-        });
+        if (socialLogin === 'kakao') {
+            await post('https://kapi.kakao.com/v1/user/logout',{},{
+                headers: {
+                    Authorization: `Bearer ${user.socialToken}`,
+                },
+            });
+        }
         
         user.socialToken = "";
         user.token = "";
