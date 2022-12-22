@@ -241,7 +241,6 @@ userRouter.post('/naverlogin', async(req,res) => {
             },
         });
 
-        console.log(responseUserInfo);
         let socialId = 'naver_'+responseUserInfo.data.response.id;
         let name = responseUserInfo.data.response.name;
         let email = responseUserInfo.data.response.email;
