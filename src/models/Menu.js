@@ -14,6 +14,7 @@ const MenuSchema = new Schema({
     isChecked: {type: Boolean, default: true},
     imageUrl: String,
     intro: String,
+    options: Array,
 }, {timestamps: true})
 
 const Menu = model('menu',MenuSchema);

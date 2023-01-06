@@ -83,6 +83,10 @@ menuRouter.get('/:_id',async(req,res) => {
 *                               type: string
 *                           intro:
 *                               type: string
+*                           options:
+*                               type: array
+*                               items:
+*                                   type: object
 *       responses:
 *           200: 
 *               description: Returns the added menu
@@ -177,6 +181,10 @@ menuRouter.delete('/:menuId', async(req,res) => {
 *                               type: string
 *                           intro:
 *                               type: string
+*                           options:
+*                               type: array
+*                               items:
+*                                   type: object
 *       responses:
 *           200: 
 *               description:  A JSON object of modified menu
@@ -186,16 +194,17 @@ menuRouter.delete('/:menuId', async(req,res) => {
 menuRouter.patch('/:menuId', async(req,res) => {
     try {
         const { menuId } = req.params;
-        const { name, price, tag, orderType, stock, imageUrl, intro } = req.body;
+        const { name, price, tag, orderType, stock, imageUrl, intro, options } = req.body;
         if (!isValidObjectId(menuId)) return res.status(400).send({err: "invalid menu id"})
-        const menu = await Menu.findByIdAndUpdate(menuId, {$set: {name, price, tag, orderType, imageUrl, intro}},{new: true});
+        const menu = await Menu.findByIdAndUpdate(menuId, {$set: {name, price, tag, orderType, imageUrl, intro, options}},{new: true});
         await MenuClass.updateOne(
             { 'menus._id': menuId }, 
             { "menus.$.name":name, "menus.$.price":price, 
               "menus.$.tag": tag, "menus.$.orderType": orderType,
               "menus.$.stock": stock,
               "menus.$.intro": intro,
-              "menus.$.imageUrl": imageUrl,})
+              "menus.$.imageUrl": imageUrl,
+              "menus.$.options": options,})
         return res.send({menu})
     } catch(err) {
         console.log(err);
