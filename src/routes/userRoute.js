@@ -495,7 +495,7 @@ userRouter.patch('/cart', async(req,res) => {
 */
 userRouter.delete('/cart', async(req,res) => {
     try {
-        let { token, menuId } = req.body;
+        let { token, menuId, option } = req.body;
         if (!token) return res.status(400).send({err: "token is required"})
         if (!menuId) return res.status(400).send({err: "menuId is required"})
         
@@ -507,7 +507,7 @@ userRouter.delete('/cart', async(req,res) => {
 
         const cart = user.cart;
         cart.map(async(cartMenu, index) => {
-            if (cartMenu._id.toString() === menuId) {
+            if (cartMenu._id.toString() === menuId && cartMenu.option["name"] === option["name"]) {
                 cart.splice(index,1);
                 await user.save().then(() => {
                     user.socialToken = "";
