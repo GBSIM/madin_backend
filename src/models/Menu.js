@@ -11,6 +11,7 @@ const MenuSchema = new Schema({
     stock: {type: Number, required: true, default: 0},
     orderType: {type: String, default: 'delivery'},
     quantity: Number,
+    option: String,
     isChecked: {type: Boolean, default: true},
     imageUrl: String,
     intro: String,

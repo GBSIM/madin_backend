@@ -82,6 +82,8 @@ orderRouter.get('/:_id',async(req,res) => {
 *                                   type: number
 *                           menuQantityArray:
 *                               type: array
+*                           menuOptionArray:
+*                               type: array
 *                           shippingId:
 *                               type: string
 *                           mileageUse:
@@ -108,12 +110,13 @@ orderRouter.post('/:ordererId', async(req,res) => {
     try {
         const { ordererId } = req.params;
         let {shippingId, mileageUse, payment, orderPrice, 
-             payedMoney, menuIdArray, menuQuantityArray} = req.body;
+             payedMoney, menuIdArray, menuQuantityArray, menuOptionArray} = req.body;
         if (!ordererId) return res.status(400).send({err: "ordererId is required"})
         if (!isValidObjectId(ordererId)) return res.status(400).send({err: "invalid ordererId id"})
         if (!menuIdArray) return res.status(400).send({err: "menuIdArray is required"})
         if (!menuQuantityArray) return res.status(400).send({err: "menuQuantityArray is required"})
-        if (menuIdArray.length != menuQuantityArray.length) return res.status(400).send({err: "The sizes o menuIdArray and menuQuantityArray must be the same"})
+        if (!menuOptionArray) return res.status(400).send({err: "menuOptionArray is required"})
+        if (menuIdArray.length != menuQuantityArray.length) return res.status(400).send({err: "The sizes of menuIdArray and menuQuantityArray must be the same"})
         if (!shippingId) return res.status(400).send({err: "shippingId is required"})
         if (!payment) return res.status(400).send({err: "payment is required"})
         let orderer = await User.findById(ordererId)
@@ -128,6 +131,7 @@ orderRouter.post('/:ordererId', async(req,res) => {
             let menu = await Menu.findById(menuId);
             if (!menu) return res.status(400).send({err: "invalid menu"})
             menu.quantity = menuQuantityArray[index];
+            menu.option = menuOptionArray[index];
             order.menus.push(menu);
             if (index === (menuIdArray.length-1)) {
                 await Promise.all([
