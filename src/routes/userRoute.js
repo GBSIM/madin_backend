@@ -349,10 +349,11 @@ userRouter.post('/logout', async(req,res) => {
 */
 userRouter.post('/cart', async(req,res) => {
     try {
-        let { token, menuId, quantity } = req.body;
+        let { token, menuId, quantity, option } = req.body;
         if (!token) return res.status(400).send({err: "token is required"})
         if (!menuId) return res.status(400).send({err: "menuId is required"})
         if (!quantity) return res.status(400).send({err: "quantity is required"})
+        if (!option) return res.status(400).send({err: "option is required"})
         
         const user = await User.findOne({token: token});
         if (!user) return res.status(400).send({err: "no matched user"})
@@ -362,11 +363,12 @@ userRouter.post('/cart', async(req,res) => {
 
         menu.quantity = quantity;
         menu.isChecked = true;
+        menu.option = option;
 
         let isMenuInCart = false;
         const cart = user.cart;
         cart.map(async(cartMenu, index) => {
-            if (cartMenu._id.toString() === menuId) {
+            if (cartMenu._id.toString() === menuId && cartMenu.option === option) {
                 if (quantity > 0) {
                     cartMenu.quantity = cartMenu.quantity + quantity;
                 } else {
