@@ -368,7 +368,7 @@ userRouter.post('/cart', async(req,res) => {
         let isMenuInCart = false;
         const cart = user.cart;
         cart.map(async(cartMenu, index) => {
-            if (cartMenu._id.toString() === menuId && cartMenu.option === option) {
+            if (cartMenu._id.toString() === menuId && cartMenu.option["name"] === option["name"]) {
                 if (quantity > 0) {
                     cartMenu.quantity = cartMenu.quantity + quantity;
                 } else {
